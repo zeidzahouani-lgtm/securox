@@ -2,6 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+function friendly(msg?: string) {
+  const m = (msg ?? "").toLowerCase();
+  if (m.includes("weak") || m.includes("easy to guess"))
+    return "Mot de passe trop faible ou trop courant. Choisissez-en un plus unique (lettres, chiffres, symboles).";
+  if (m.includes("already")) return "Ce compte existe déjà";
+  return msg || "Création impossible";
+}
+
 export const createScannerAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
@@ -26,14 +34,14 @@ export const createScannerAccount = createServerFn({ method: "POST" })
       password: data.password,
       email_confirm: true,
     });
-    if (error || !created.user) throw new Error(error?.message ?? "Création impossible");
+    if (error || !created.user) return { id: null, error: friendly(error?.message) };
 
     const id = created.user.id;
     await supabaseAdmin.from("user_roles").insert({ user_id: id, role: "scanner" });
     await supabaseAdmin
       .from("profiles")
       .upsert({ id, email: data.email, full_name: data.fullName ?? null });
-    return { id };
+    return { id, error: null as string | null };
   });
 
 export const createClientAccount = createServerFn({ method: "POST" })
@@ -70,8 +78,8 @@ export const createClientAccount = createServerFn({ method: "POST" })
     });
     if (error || !created.user) {
       if (error?.message?.toLowerCase().includes("already"))
-        throw new Error("Ce nom d'utilisateur est déjà pris");
-      throw new Error(error?.message ?? "Création impossible");
+        return { id: null, error: "Ce nom d'utilisateur est déjà pris" };
+      return { id: null, error: friendly(error?.message) };
     }
 
     const id = created.user.id;
@@ -79,5 +87,5 @@ export const createClientAccount = createServerFn({ method: "POST" })
     await supabaseAdmin
       .from("profiles")
       .upsert({ id, email, full_name: data.fullName ?? null, username });
-    return { id };
+    return { id, error: null as string | null };
   });

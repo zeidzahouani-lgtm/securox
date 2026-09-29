@@ -24,7 +24,11 @@ export function UsersTab() {
   const clients = useQuery({ queryKey: ["clients"], queryFn: listClients });
 
   const createScanner = useMutation({
-    mutationFn: () => createScannerFn({ data: { email, password, fullName } }),
+    mutationFn: async () => {
+      const r = await createScannerFn({ data: { email, password, fullName } });
+      if (r.error) throw new Error(r.error);
+      return r;
+    },
     onSuccess: () => {
       setEmail("");
       setPassword("");
