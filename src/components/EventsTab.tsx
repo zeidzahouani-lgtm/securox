@@ -165,7 +165,7 @@ export function EventsTab() {
                   return (
                     <label key={s.id} className="flex items-center gap-3 text-sm">
                       <input type="checkbox" checked={on} onChange={() => toggle.mutate({ uid: s.id, on: !on })} />
-                      {s.full_name || s.email}
+                      {s.full_name || (s.username ? `@${s.username}` : s.email)}
                     </label>
                   );
                 })}
