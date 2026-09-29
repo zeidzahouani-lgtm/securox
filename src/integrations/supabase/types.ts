@@ -19,8 +19,10 @@ export type Database = {
           checked_in_at: string | null
           created_at: string
           event_id: string
+          first_name: string | null
           guest_name: string | null
           id: string
+          last_name: string | null
           status: string
           ticket_code: string
         }
@@ -28,8 +30,10 @@ export type Database = {
           checked_in_at?: string | null
           created_at?: string
           event_id: string
+          first_name?: string | null
           guest_name?: string | null
           id?: string
+          last_name?: string | null
           status?: string
           ticket_code: string
         }
@@ -37,8 +41,10 @@ export type Database = {
           checked_in_at?: string | null
           created_at?: string
           event_id?: string
+          first_name?: string | null
           guest_name?: string | null
           id?: string
+          last_name?: string | null
           status?: string
           ticket_code?: string
         }
@@ -52,30 +58,98 @@ export type Database = {
           },
         ]
       }
+      event_scanners: {
+        Row: {
+          event_id: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_scanners_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
+          client_id: string | null
           created_at: string
           current_count: number
           date: string
           id: string
+          invite_token: string
           max_capacity: number
           title: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           current_count?: number
           date: string
           id?: string
+          invite_token?: string
           max_capacity: number
           title: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           current_count?: number
           date?: string
           id?: string
+          invite_token?: string
           max_capacity?: number
           title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -88,9 +162,26 @@ export type Database = {
         Args: { _event_id: string; _force?: boolean; _ticket_code: string }
         Returns: Json
       }
+      claim_event: { Args: { _token: string }; Returns: string }
+      ensure_my_role: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_event_client: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_event_scanner: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "scanner" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -217,6 +308,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "scanner", "client"],
+    },
   },
 } as const

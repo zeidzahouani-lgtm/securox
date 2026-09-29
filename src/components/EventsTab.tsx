@@ -1,54 +1,50 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
-import { Printer, Download, Loader2 } from "lucide-react";
+import { Copy, Loader2, Trash2 } from "lucide-react";
 import {
-  createEventWithTickets,
+  createEvent,
+  deleteEvent,
+  listAssignments,
   listAttendees,
   listEvents,
-  renameGuest,
+  listScanners,
+  setAssignment,
   type EventRow,
 } from "@/lib/gate";
-
-function StatusBadge({ status }: { status: string }) {
-  const tone =
-    status === "Checked-in"
-      ? "bg-mint/15 text-mint"
-      : status === "Over-limit"
-        ? "bg-amber/15 text-amber"
-        : "bg-white/10 text-white/60";
-  return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${tone}`}>
-      {status}
-    </span>
-  );
-}
 
 export function EventsTab() {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [capacity, setCapacity] = useState(250);
-  const [batchSize, setBatchSize] = useState(250);
+  const [capacity, setCapacity] = useState(100);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const events = useQuery({ queryKey: ["events"], queryFn: listEvents });
+  const scanners = useQuery({ queryKey: ["scanners"], queryFn: listScanners });
 
   useEffect(() => {
     if (!selectedId && events.data?.length) setSelectedId(events.data[0]!.id);
   }, [events.data, selectedId]);
+
+  const selected = events.data?.find((e) => e.id === selectedId) ?? null;
 
   const attendees = useQuery({
     queryKey: ["attendees", selectedId],
     queryFn: () => listAttendees(selectedId!),
     enabled: !!selectedId,
   });
+  const assigned = useQuery({
+    queryKey: ["assign", selectedId],
+    queryFn: () => listAssignments(selectedId!),
+    enabled: !!selectedId,
+  });
 
   const create = useMutation({
-    mutationFn: createEventWithTickets,
-    onSuccess: (event: EventRow) => {
-      setSelectedId(event.id);
+    mutationFn: createEvent,
+    onSuccess: (e: EventRow) => {
+      setSelectedId(e.id);
       setTitle("");
       setDate("");
       qc.invalidateQueries({ queryKey: ["events"] });
@@ -56,159 +52,110 @@ export function EventsTab() {
     onError: (e: Error) => setError(e.message),
   });
 
-  const rename = useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) => renameGuest(id, name),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["attendees", selectedId] }),
+  const remove = useMutation({
+    mutationFn: deleteEvent,
+    onSuccess: () => {
+      setSelectedId(null);
+      qc.invalidateQueries({ queryKey: ["events"] });
+    },
   });
 
-  const selected = events.data?.find((e) => e.id === selectedId) ?? null;
-  const tickets = attendees.data ?? [];
-  const redeemed = tickets.filter((t) => t.status !== "Pending").length;
+  const toggle = useMutation({
+    mutationFn: ({ uid, on }: { uid: string; on: boolean }) => setAssignment(selectedId!, uid, on),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["assign", selectedId] }),
+  });
 
-  function downloadCodes() {
-    if (!selected) return;
-    const csv = [
-      "ticket_code,guest_name,status",
-      ...tickets.map((t) => `${t.ticket_code},${t.guest_name ?? ""},${t.status}`),
-    ].join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${selected.title.replace(/\s+/g, "-").toLowerCase()}-tickets.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  const link = selected ? `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${selected.invite_token}` : "";
+  const tickets = attendees.data ?? [];
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-      <div className="lg:col-span-7 space-y-6">
-        <div className="glass-panel rounded-3xl p-6 no-print">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="font-display text-2xl font-bold tracking-tight">New Event</h2>
-            <span className="text-[11px] uppercase tracking-[0.2em] text-accent">Draft</span>
-          </div>
+      <div className="space-y-6 lg:col-span-7">
+        <div className="glass-panel rounded-3xl p-6">
+          <h2 className="mb-5 font-display text-2xl font-bold tracking-tight">Nouvel événement</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="field-label">Event name</label>
-              <input
-                className="field-input mt-1"
-                placeholder="Neon Nights — Rooftop Set"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
+              <label className="field-label">Nom</label>
+              <input className="field-input mt-1" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
             <div>
-              <label className="field-label">Date &amp; time</label>
-              <input
-                type="datetime-local"
-                className="field-input mt-1"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <label className="field-label">Date &amp; heure</label>
+              <input type="datetime-local" className="field-input mt-1" value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div>
-              <label className="field-label">Capacity</label>
-              <input
-                type="number"
-                min={1}
-                className="field-input mt-1"
-                value={capacity}
-                onChange={(e) => setCapacity(Number(e.target.value))}
-              />
-            </div>
-            <div>
-              <label className="field-label">QR batch size</label>
-              <input
-                type="number"
-                min={1}
-                className="field-input mt-1"
-                value={batchSize}
-                onChange={(e) => setBatchSize(Number(e.target.value))}
-              />
+              <label className="field-label">Nombre de QR codes</label>
+              <input type="number" min={1} className="field-input mt-1" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} />
             </div>
           </div>
           {error && <p className="mt-3 text-sm text-rose">{error}</p>}
-          <div className="mt-5 flex items-center gap-3">
-            <button
-              disabled={create.isPending || !title || !date}
-              onClick={() => {
-                setError(null);
-                create.mutate({ title, date, capacity, batchSize });
-              }}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40"
-            >
-              {create.isPending && <Loader2 className="size-4 animate-spin" />}
-              Generate QR Tickets
-            </button>
-          </div>
+          <button
+            disabled={create.isPending || !title || !date || capacity < 1}
+            onClick={() => {
+              setError(null);
+              create.mutate({ title, date, capacity });
+            }}
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40"
+          >
+            {create.isPending && <Loader2 className="size-4 animate-spin" />}
+            Créer l'événement
+          </button>
         </div>
 
-        <div className="glass-panel rounded-3xl p-6 print-area">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">
-              QR Ticket Batch{selected ? ` — ${selected.title}` : ""}
-            </h3>
-            <div className="flex items-center gap-3 no-print">
-              <span className="text-xs text-muted-foreground">
-                {tickets.length} generated · {redeemed} redeemed
-              </span>
-              <button onClick={downloadCodes} className="text-accent" aria-label="Download codes">
-                <Download className="size-4" />
-              </button>
-              <button onClick={() => window.print()} className="text-accent" aria-label="Print grid">
-                <Printer className="size-4" />
+        {selected && (
+          <div className="glass-panel space-y-5 rounded-3xl p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-lg font-semibold">{selected.title}</h3>
+              <button onClick={() => confirm("Supprimer cet événement ?") && remove.mutate(selected.id)} className="text-rose" aria-label="Supprimer">
+                <Trash2 className="size-4" />
               </button>
             </div>
-          </div>
-          {!tickets.length && (
-            <p className="text-sm text-muted-foreground">
-              Create an event to mint its ticket batch.
-            </p>
-          )}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-            {tickets.slice(0, 120).map((t) => (
-              <div key={t.id} className="rounded-2xl border border-white/10 bg-ink/40 p-3">
-                <div className="mb-2 grid aspect-square place-items-center rounded-lg bg-white">
-                  <QRCodeSVG value={t.ticket_code} size={96} />
-                </div>
-                <p className="font-mono text-[11px] text-white/60">{t.ticket_code}</p>
-                <input
-                  className="mt-1 w-full bg-transparent text-sm outline-none placeholder:text-white/30"
-                  placeholder="Guest name"
-                  defaultValue={t.guest_name ?? ""}
-                  onBlur={(e) => {
-                    if (e.target.value !== (t.guest_name ?? "")) {
-                      rename.mutate({ id: t.id, name: e.target.value });
-                    }
+            <div>
+              <p className="field-label">Lien à envoyer au client</p>
+              <div className="mt-1 flex gap-2">
+                <input readOnly className="field-input font-mono text-xs" value={link} />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(link);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
                   }}
-                />
-                <div className="mt-2">
-                  <StatusBadge status={t.status} />
-                </div>
+                  className="inline-flex items-center gap-1 rounded-xl border border-white/10 px-3 text-sm text-accent"
+                >
+                  <Copy className="size-4" /> {copied ? "Copié" : "Copier"}
+                </button>
               </div>
-            ))}
+              <p className="mt-2 text-xs text-muted-foreground">
+                {selected.client_id ? "Client associé" : "Aucun client n'a encore ouvert le lien"} · {tickets.length}/{selected.max_capacity} QR codes créés · {selected.current_count} entrées
+              </p>
+            </div>
+            <div>
+              <p className="field-label mb-2">Scanners assignés</p>
+              {!scanners.data?.length && <p className="text-sm text-muted-foreground">Créez d'abord un scanner dans l'onglet Utilisateurs.</p>}
+              <div className="space-y-2">
+                {scanners.data?.map((s) => {
+                  const on = assigned.data?.includes(s.id) ?? false;
+                  return (
+                    <label key={s.id} className="flex items-center gap-3 text-sm">
+                      <input type="checkbox" checked={on} onChange={() => toggle.mutate({ uid: s.id, on: !on })} />
+                      {s.full_name || s.email}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          {tickets.length > 120 && (
-            <p className="mt-4 text-xs text-muted-foreground">
-              Showing first 120 of {tickets.length} tickets.
-            </p>
-          )}
-        </div>
+        )}
       </div>
 
-      <div className="lg:col-span-5 no-print">
+      <div className="lg:col-span-5">
         <div className="glass-panel rounded-3xl p-6">
-          <h3 className="mb-4 font-display text-lg font-semibold">Events</h3>
+          <h3 className="mb-4 font-display text-lg font-semibold">Événements</h3>
           <div className="space-y-2">
             {events.data?.map((e) => (
               <button
                 key={e.id}
                 onClick={() => setSelectedId(e.id)}
-                className={`w-full rounded-2xl border p-4 text-left transition-colors ${
-                  e.id === selectedId
-                    ? "border-accent/50 bg-accent/10"
-                    : "border-white/10 bg-white/5 hover:bg-white/10"
-                }`}
+                className={`w-full rounded-2xl border p-4 text-left ${e.id === selectedId ? "border-accent/50 bg-accent/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}
               >
                 <div className="flex items-baseline justify-between">
                   <span className="font-semibold">{e.title}</span>
@@ -217,14 +164,10 @@ export function EventsTab() {
                     <span className="text-white/30">/{e.max_capacity}</span>
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {new Date(e.date).toLocaleString()}
-                </p>
+                <p className="mt-1 text-xs text-muted-foreground">{new Date(e.date).toLocaleString()}</p>
               </button>
             ))}
-            {!events.data?.length && !events.isLoading && (
-              <p className="text-sm text-muted-foreground">No events yet.</p>
-            )}
+            {!events.data?.length && !events.isLoading && <p className="text-sm text-muted-foreground">Aucun événement.</p>}
           </div>
         </div>
       </div>
