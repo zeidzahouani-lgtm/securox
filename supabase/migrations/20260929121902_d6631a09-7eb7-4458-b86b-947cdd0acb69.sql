@@ -1,0 +1,1 @@
+ALTER FUNCTION public.check_in_ticket(TEXT, UUID, BOOLEAN) SECURITY INVOKER;
