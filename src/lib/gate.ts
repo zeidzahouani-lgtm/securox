@@ -129,6 +129,29 @@ export async function listScanners(): Promise<ScannerUser[]> {
   return (data ?? []) as ScannerUser[];
 }
 
+export interface ClientUser {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  username: string | null;
+}
+
+export async function listClients(): Promise<ClientUser[]> {
+  const { data: roles, error } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "client");
+  if (error) throw error;
+  const ids = (roles ?? []).map((r) => r.user_id);
+  if (!ids.length) return [];
+  const { data, error: e2 } = await supabase
+    .from("profiles")
+    .select("id,email,full_name,username")
+    .in("id", ids);
+  if (e2) throw e2;
+  return (data ?? []) as ClientUser[];
+}
+
 export async function listAssignments(eventId: string): Promise<string[]> {
   const { data, error } = await supabase
     .from("event_scanners")
