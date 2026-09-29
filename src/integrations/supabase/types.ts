@@ -14,13 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendees: {
+        Row: {
+          checked_in_at: string | null
+          created_at: string
+          event_id: string
+          guest_name: string | null
+          id: string
+          status: string
+          ticket_code: string
+        }
+        Insert: {
+          checked_in_at?: string | null
+          created_at?: string
+          event_id: string
+          guest_name?: string | null
+          id?: string
+          status?: string
+          ticket_code: string
+        }
+        Update: {
+          checked_in_at?: string | null
+          created_at?: string
+          event_id?: string
+          guest_name?: string | null
+          id?: string
+          status?: string
+          ticket_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          current_count: number
+          date: string
+          id: string
+          max_capacity: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          current_count?: number
+          date: string
+          id?: string
+          max_capacity: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          current_count?: number
+          date?: string
+          id?: string
+          max_capacity?: number
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_in_ticket: {
+        Args: { _event_id: string; _force?: boolean; _ticket_code: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
