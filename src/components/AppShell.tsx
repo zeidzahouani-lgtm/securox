@@ -7,7 +7,7 @@ import { EventsTab } from "./EventsTab";
 import { ScannerTab } from "./ScannerTab";
 import { UsersTab } from "./UsersTab";
 import { ClientTab } from "./ClientTab";
-import logoAsset from "@/assets/dravox-access-logo.jpeg.asset.json";
+import logoAsset from "@/assets/dravox-access-logo.png.asset.json";
 
 const ROLE_LABEL: Record<Role, string> = { admin: "Admin", scanner: "Scanner", client: "Client" };
 
