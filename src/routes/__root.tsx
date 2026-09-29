@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PulseGate — Event Access Control" },
-      { name: "description", content: "Event management, QR tickets and live door check-in." },
-      { property: "og:title", content: "PulseGate — Event Access Control" },
+      { title: "Dravox Access — Contrôle d'accès événementiel" },
+      { name: "description", content: "Gestion d'événements, tickets QR et contrôle d'accès en direct." },
+      { property: "og:title", content: "Dravox Access — Contrôle d'accès événementiel" },
       {
         property: "og:description",
         content: "Event management, QR tickets and live door check-in.",
@@ -93,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

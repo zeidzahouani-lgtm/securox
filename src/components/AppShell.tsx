@@ -7,6 +7,7 @@ import { EventsTab } from "./EventsTab";
 import { ScannerTab } from "./ScannerTab";
 import { UsersTab } from "./UsersTab";
 import { ClientTab } from "./ClientTab";
+import logoAsset from "@/assets/dravox-access-logo.jpeg.asset.json";
 
 const ROLE_LABEL: Record<Role, string> = { admin: "Admin", scanner: "Scanner", client: "Client" };
 
@@ -20,11 +21,7 @@ export function Frame({ children, right }: { children: ReactNode; right?: ReactN
       <div className="relative z-10 mx-auto max-w-[1440px] px-6 py-6">
         <header className="mb-8 flex items-center justify-between no-print">
           <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-accent to-accent2 font-display text-lg font-bold text-accent-foreground">P</div>
-            <div>
-              <p className="font-display text-lg font-bold leading-none tracking-tight">PulseGate</p>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access Control</p>
-            </div>
+            <img src={logoAsset.url} alt="Dravox Access" className="h-10 w-auto rounded-lg bg-white object-contain px-1.5 py-0.5" />
           </div>
           {right}
         </header>
