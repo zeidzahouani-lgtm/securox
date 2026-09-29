@@ -150,7 +150,7 @@ export function ScannerTab() {
             />
             <button
               onClick={() => submit(code)}
-              className="rounded-xl bg-gradient-to-r from-accent to-accent2 px-5 py-3 font-display text-sm font-semibold text-accent-foreground"
+              className="whitespace-nowrap rounded-xl bg-gradient-to-r from-accent to-accent2 px-5 py-3 font-display text-sm font-semibold text-accent-foreground"
             >
               Check in
             </button>
