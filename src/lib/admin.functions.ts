@@ -68,7 +68,7 @@ export const createClientAccount = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Accès réservé à l'admin");
 
     const username = data.username.toLowerCase();
-    const email = `${username}@pulsegate.local`;
+    const email = `${username}@dravox.local`;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
