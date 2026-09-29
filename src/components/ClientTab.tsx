@@ -146,18 +146,12 @@ export function ClientTab({ initialEventId }: { initialEventId?: string | null |
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
           {list.map((t) => (
-            <div key={t.id} className="rounded-2xl border border-white/10 bg-ink/40 p-3">
-              <div className="mb-2 grid aspect-square place-items-center rounded-lg bg-white">
-                <QRCodeSVG value={t.ticket_code} size={110} />
-              </div>
-              <p className="font-semibold">{t.first_name} {t.last_name}</p>
-              <p className="font-mono text-[11px] text-white/60">{t.ticket_code}</p>
-              {t.status === "Pending" && (
-                <button onClick={() => remove.mutate(t.id)} className="mt-2 text-rose no-print" aria-label="Supprimer">
-                  <Trash2 className="size-3.5" />
-                </button>
-              )}
-            </div>
+            <TicketQr
+              key={t.id}
+              code={t.ticket_code}
+              guestName={`${t.first_name ?? ""} ${t.last_name ?? ""}`.trim()}
+              onRemove={() => remove.mutate(t.id)}
+            />
           ))}
         </div>
       </div>
