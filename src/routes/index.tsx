@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Dravox Access — Contrôle d'accès événementiel" },
       { name: "description", content: "Admin, clients et scanners : créez vos événements, générez les QR codes nominatifs et contrôlez l'entrée en direct." },
-      { property: "og:title", content: "PulseGate — Contrôle d'accès événementiel" },
+      { property: "og:title", content: "Dravox Access — Contrôle d'accès événementiel" },
       { property: "og:description", content: "Créez vos événements, générez les QR codes nominatifs et contrôlez l'entrée en direct." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

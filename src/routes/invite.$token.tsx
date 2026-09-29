@@ -10,7 +10,7 @@ export const Route = createFileRoute("/invite/$token")({
     meta: [
       { title: "Invitation — Dravox Access" },
       { name: "description", content: "Créez les QR codes de vos invités pour votre événement." },
-      { property: "og:title", content: "Invitation — PulseGate" },
+      { property: "og:title", content: "Invitation — Dravox Access" },
       { property: "og:description", content: "Créez les QR codes de vos invités pour votre événement." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
