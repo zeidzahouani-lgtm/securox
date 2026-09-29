@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Copy, Loader2, Trash2 } from "lucide-react";
+import { Copy, FileDown, Loader2, Trash2 } from "lucide-react";
+import { downloadEventReport } from "@/lib/report";
 import {
+  closeEndedEvents,
   createEvent,
   deleteEvent,
   listAssignments,
@@ -16,12 +18,19 @@ export function EventsTab() {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [capacity, setCapacity] = useState(100);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const events = useQuery({ queryKey: ["events"], queryFn: listEvents });
+  const events = useQuery({
+    queryKey: ["events"],
+    queryFn: async () => {
+      await closeEndedEvents().catch(() => {});
+      return listEvents();
+    },
+  });
   const scanners = useQuery({ queryKey: ["scanners"], queryFn: listScanners });
 
   useEffect(() => {
@@ -47,6 +56,7 @@ export function EventsTab() {
       setSelectedId(e.id);
       setTitle("");
       setDate("");
+      setEndDate("");
       qc.invalidateQueries({ queryKey: ["events"] });
     },
     onError: (e: Error) => setError(e.message),
@@ -79,8 +89,12 @@ export function EventsTab() {
               <input className="field-input mt-1" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
             <div>
-              <label className="field-label">Date &amp; heure</label>
+              <label className="field-label">Début</label>
               <input type="datetime-local" className="field-input mt-1" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="field-label">Fin</label>
+              <input type="datetime-local" className="field-input mt-1" value={endDate} min={date} onChange={(e) => setEndDate(e.target.value)} />
             </div>
             <div>
               <label className="field-label">Nombre de QR codes</label>
@@ -89,10 +103,10 @@ export function EventsTab() {
           </div>
           {error && <p className="mt-3 text-sm text-rose">{error}</p>}
           <button
-            disabled={create.isPending || !title || !date || capacity < 1}
+            disabled={create.isPending || !title || !date || !endDate || capacity < 1}
             onClick={() => {
               setError(null);
-              create.mutate({ title, date, capacity });
+              create.mutate({ title, date, endDate, capacity });
             }}
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40"
           >
@@ -109,6 +123,20 @@ export function EventsTab() {
                 <Trash2 className="size-4" />
               </button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              {new Date(selected.date).toLocaleString()} → {selected.end_date ? new Date(selected.end_date).toLocaleString() : "—"}
+            </p>
+            <button
+              onClick={() => downloadEventReport(selected, tickets)}
+              className="inline-flex items-center gap-2 rounded-xl border border-accent/40 px-4 py-2 text-sm font-semibold text-accent"
+            >
+              <FileDown className="size-4" /> Rapport de présence (PDF)
+            </button>
+            {selected.closed_at ? (
+              <p className="rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-muted-foreground">
+                Événement terminé le {new Date(selected.closed_at).toLocaleString()} : les QR codes et les accès ont été supprimés. Seul le rapport reste disponible.
+              </p>
+            ) : (<>
             <div>
               <p className="field-label">Lien à envoyer au client</p>
               <div className="mt-1 flex gap-2">
@@ -137,12 +165,13 @@ export function EventsTab() {
                   return (
                     <label key={s.id} className="flex items-center gap-3 text-sm">
                       <input type="checkbox" checked={on} onChange={() => toggle.mutate({ uid: s.id, on: !on })} />
-                      {s.full_name || s.email}
+                      {s.full_name || (s.username ? `@${s.username}` : s.email)}
                     </label>
                   );
                 })}
               </div>
             </div>
+            </>)}
           </div>
         )}
       </div>
@@ -164,7 +193,10 @@ export function EventsTab() {
                     <span className="text-white/30">/{e.max_capacity}</span>
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{new Date(e.date).toLocaleString()}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {new Date(e.date).toLocaleString()}
+                  {e.closed_at && <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5">Terminé</span>}
+                </p>
               </button>
             ))}
             {!events.data?.length && !events.isLoading && <p className="text-sm text-muted-foreground">Aucun événement.</p>}

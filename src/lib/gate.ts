@@ -9,7 +9,21 @@ export type EventRow = {
   created_at: string;
   client_id: string | null;
   invite_token: string;
+  end_date: string | null;
+  closed_at: string | null;
+  report: EventReport | null;
 };
+
+export type EventReport = {
+  generated: number;
+  checked_in: number;
+  over_limit: number;
+  attendees: { name: string | null; code: string; status: string; checked_in_at: string | null }[];
+};
+
+export async function closeEndedEvents() {
+  await supabase.rpc("close_ended_events");
+}
 
 export type AttendeeRow = {
   id: string;
@@ -52,7 +66,7 @@ export async function listEvents(): Promise<EventRow[]> {
     .select("*")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as EventRow[];
+  return (data ?? []) as unknown as EventRow[];
 }
 
 export async function listAttendees(eventId: string): Promise<AttendeeRow[]> {
@@ -68,13 +82,16 @@ export async function listAttendees(eventId: string): Promise<AttendeeRow[]> {
 export async function createEvent(input: {
   title: string;
   date: string;
+  endDate: string;
   capacity: number;
 }): Promise<EventRow> {
+  if (new Date(input.endDate) <= new Date(input.date)) throw new Error("La fin doit être après le début");
   const { data, error } = await supabase
     .from("events")
     .insert({
       title: input.title,
       date: new Date(input.date).toISOString(),
+      end_date: new Date(input.endDate).toISOString(),
       max_capacity: input.capacity,
     })
     .select()
@@ -111,7 +128,7 @@ export async function claimEvent(token: string): Promise<string> {
   return data as string;
 }
 
-export type ScannerUser = { id: string; email: string | null; full_name: string | null };
+export type ScannerUser = { id: string; email: string | null; full_name: string | null; username?: string | null };
 
 export async function listScanners(): Promise<ScannerUser[]> {
   const { data: roles, error } = await supabase
@@ -123,7 +140,7 @@ export async function listScanners(): Promise<ScannerUser[]> {
   if (!ids.length) return [];
   const { data, error: e2 } = await supabase
     .from("profiles")
-    .select("id,email,full_name")
+    .select("id,email,full_name,username")
     .in("id", ids);
   if (e2) throw e2;
   return (data ?? []) as ScannerUser[];
@@ -137,10 +154,18 @@ export interface ClientUser {
 }
 
 export async function listClients(): Promise<ClientUser[]> {
+  return listByRole("client");
+}
+
+export async function listAdmins(): Promise<ClientUser[]> {
+  return listByRole("admin");
+}
+
+async function listByRole(role: "client" | "admin"): Promise<ClientUser[]> {
   const { data: roles, error } = await supabase
     .from("user_roles")
     .select("user_id")
-    .eq("role", "client");
+    .eq("role", role);
   if (error) throw error;
   const ids = (roles ?? []).map((r) => r.user_id);
   if (!ids.length) return [];
