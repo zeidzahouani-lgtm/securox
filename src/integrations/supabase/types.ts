@@ -84,32 +84,41 @@ export type Database = {
       events: {
         Row: {
           client_id: string | null
+          closed_at: string | null
           created_at: string
           current_count: number
           date: string
+          end_date: string | null
           id: string
           invite_token: string
           max_capacity: number
+          report: Json | null
           title: string
         }
         Insert: {
           client_id?: string | null
+          closed_at?: string | null
           created_at?: string
           current_count?: number
           date: string
+          end_date?: string | null
           id?: string
           invite_token?: string
           max_capacity: number
+          report?: Json | null
           title: string
         }
         Update: {
           client_id?: string | null
+          closed_at?: string | null
           created_at?: string
           current_count?: number
           date?: string
+          end_date?: string | null
           id?: string
           invite_token?: string
           max_capacity?: number
+          report?: Json | null
           title?: string
         }
         Relationships: []
@@ -166,6 +175,7 @@ export type Database = {
         Returns: Json
       }
       claim_event: { Args: { _token: string }; Returns: string }
+      close_ended_events: { Args: never; Returns: number }
       ensure_my_role: { Args: never; Returns: string }
       has_role: {
         Args: {
