@@ -30,10 +30,12 @@ function downloadTicketJpg(canvas: HTMLCanvasElement, guestName: string, code: s
 function TicketQr({
   code,
   guestName,
+  status,
   onRemove,
 }: {
   code: string;
   guestName: string;
+  status: string;
   onRemove: () => void;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -52,9 +54,11 @@ function TicketQr({
         >
           <Download className="size-3.5" /> JPG
         </button>
-        <button onClick={onRemove} className="text-rose" aria-label="Supprimer">
-          <Trash2 className="size-3.5" />
-        </button>
+        {status === "Pending" && (
+          <button onClick={onRemove} className="text-rose" aria-label="Supprimer">
+            <Trash2 className="size-3.5" />
+          </button>
+        )}
       </div>
     </div>
   );
