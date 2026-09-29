@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-export function AuthForm({ subtitle }: { subtitle?: string }) {
+export function AuthForm({ subtitle }: { subtitle?: string | undefined }) {
   const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

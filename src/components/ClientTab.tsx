@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Printer, Trash2 } from "lucide-react";
 import { addAttendee, deleteAttendee, listAttendees, listEvents } from "@/lib/gate";
 
-export function ClientTab({ initialEventId }: { initialEventId?: string | null }) {
+export function ClientTab({ initialEventId }: { initialEventId?: string | null | undefined }) {
   const qc = useQueryClient();
   const events = useQuery({ queryKey: ["events"], queryFn: listEvents });
   const [eventId, setEventId] = useState<string | null>(initialEventId ?? null);
