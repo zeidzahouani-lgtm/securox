@@ -154,6 +154,7 @@ export function ClientTab({ initialEventId }: { initialEventId?: string | null |
               key={t.id}
               code={t.ticket_code}
               guestName={`${t.first_name ?? ""} ${t.last_name ?? ""}`.trim()}
+              status={t.status}
               onRemove={() => remove.mutate(t.id)}
             />
           ))}
