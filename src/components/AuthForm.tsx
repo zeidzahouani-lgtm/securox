@@ -16,7 +16,19 @@ export function AuthForm({ subtitle }: { subtitle?: string | undefined }) {
     setErr(null);
     setMsg(null);
     if (mode === "in") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      let loginEmail = email.trim();
+      if (!loginEmail.includes("@")) {
+        const { data: resolved, error: rErr } = await supabase.rpc("resolve_login", {
+          _username: loginEmail,
+        });
+        if (rErr || !resolved) {
+          setErr("Nom d'utilisateur introuvable.");
+          setBusy(false);
+          return;
+        }
+        loginEmail = resolved;
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
       if (error) setErr(error.message);
     } else {
       const { data, error } = await supabase.auth.signUp({
@@ -38,8 +50,8 @@ export function AuthForm({ subtitle }: { subtitle?: string | undefined }) {
       {subtitle && <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>}
       <form onSubmit={submit} className="mt-6 space-y-4">
         <div>
-          <label className="field-label">Email</label>
-          <input type="email" required className="field-input mt-1" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <label className="field-label">{mode === "in" ? "Email ou nom d'utilisateur" : "Email"}</label>
+          <input type={mode === "in" ? "text" : "email"} required className="field-input mt-1" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div>
           <label className="field-label">Mot de passe</label>
