@@ -39,10 +39,13 @@ export function UsersTab() {
   });
 
   const createClient = useMutation({
-    mutationFn: () =>
-      createClientFn({
+    mutationFn: async () => {
+      const r = await createClientFn({
         data: { username: clientUsername, password: clientPassword, fullName: clientName || undefined },
-      }),
+      });
+      if (r.error) throw new Error(r.error);
+      return r;
+    },
     onSuccess: () => {
       setClientUsername("");
       setClientPassword("");
