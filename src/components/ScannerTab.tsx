@@ -15,6 +15,7 @@ export function ScannerTab() {
   const [feed, setFeed] = useState<Feed[]>([]);
   const [cameraOn, setCameraOn] = useState(false);
   const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
+  const lastScanRef = useRef<{ code: string; at: number } | null>(null);
 
   useEffect(() => {
     if (!eventId && events.data?.length) setEventId(events.data[0]!.id);
@@ -61,9 +62,15 @@ export function ScannerTab() {
   });
 
   function submit(value: string) {
-    if (!value.trim() || !eventId) return;
+    const ticket = value.trim();
+    if (!ticket || !eventId) return;
+    const now = Date.now();
+    const prev = lastScanRef.current;
+    // Ignore the same code scanned again within 4 seconds (camera reads continuously)
+    if (prev && prev.code === ticket.toUpperCase() && now - prev.at < 4000) return;
+    lastScanRef.current = { code: ticket.toUpperCase(), at: now };
     setCode("");
-    scan.mutate({ ticket: value, force: false });
+    scan.mutate({ ticket, force: false });
   }
 
   useEffect(() => {
