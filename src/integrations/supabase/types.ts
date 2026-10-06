@@ -184,6 +184,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_add: {
+        Args: { _count?: number; _first: string; _last: string; _token: string }
+        Returns: number
+      }
+      invite_delete: {
+        Args: { _id: string; _token: string }
+        Returns: undefined
+      }
+      invite_get: { Args: { _token: string }; Returns: Json }
       is_event_client: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
