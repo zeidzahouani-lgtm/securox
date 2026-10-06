@@ -214,3 +214,21 @@ export async function scanTicket(
   if (error) throw error;
   return data as unknown as ScanResult;
 }
+
+export type InviteData = {
+  id: string; title: string; date: string; end_date: string | null; max_capacity: number;
+  attendees: Pick<AttendeeRow, "id" | "ticket_code" | "first_name" | "last_name" | "guest_name" | "status">[];
+};
+export async function inviteGet(token: string): Promise<InviteData> {
+  const { data, error } = await (supabase.rpc as any)("invite_get", { _token: token });
+  if (error) throw error;
+  return data as InviteData;
+}
+export async function inviteAdd(token: string, first: string, last: string, count: number) {
+  const { error } = await (supabase.rpc as any)("invite_add", { _token: token, _first: first, _last: last, _count: count });
+  if (error) throw error;
+}
+export async function inviteDelete(token: string, id: string) {
+  const { error } = await (supabase.rpc as any)("invite_delete", { _token: token, _id: id });
+  if (error) throw error;
+}

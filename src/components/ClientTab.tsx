@@ -27,7 +27,7 @@ function downloadTicketJpg(canvas: HTMLCanvasElement, guestName: string, code: s
   link.click();
 }
 
-function TicketQr({
+export function TicketQr({
   code,
   guestName,
   status,
