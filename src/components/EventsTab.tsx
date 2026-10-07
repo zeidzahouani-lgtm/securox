@@ -13,9 +13,11 @@ import {
   setAssignment,
   type EventRow,
 } from "@/lib/gate";
+import { useLiveGate } from "@/lib/realtime";
 
 export function EventsTab() {
   const qc = useQueryClient();
+  useLiveGate();
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [endDate, setEndDate] = useState("");
