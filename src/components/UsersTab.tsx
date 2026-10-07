@@ -70,7 +70,7 @@ function AccountPanel({ role }: { role: Role }) {
       </div>
       <ul className="mt-8 space-y-2 text-sm">
         {list.data?.map((u) => (
-          <li key={u.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
+          <li key={u.id} className="rounded-xl border border-border bg-muted/50 p-3">
             <p className="font-semibold">{u.full_name || u.username || "—"}</p>
             <p className="text-muted-foreground">{u.username ? `@${u.username}` : u.email}</p>
           </li>

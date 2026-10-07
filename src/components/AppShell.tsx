@@ -52,7 +52,7 @@ export function AppShell({ authSubtitle, children }: { authSubtitle?: string; ch
               qc.clear();
               await signOut();
             }}
-            className="text-white/60 hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground"
             aria-label="Se déconnecter"
           >
             <LogOut className="size-4" />
@@ -76,12 +76,12 @@ function RoleHome({ role }: { role: Role }) {
   ] as const;
   return (
     <>
-      <div className="mb-8 flex w-fit items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 no-print">
+      <div className="mb-8 flex w-fit items-center gap-1 rounded-full border border-border bg-muted/50 p-1 no-print">
         {tabs.map(([k, label]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
-            className={`rounded-full px-5 py-2 text-sm ${tab === k ? "bg-gradient-to-r from-accent to-accent2 font-display font-semibold text-accent-foreground" : "text-white/60"}`}
+            className={`rounded-full px-5 py-2 text-sm ${tab === k ? "bg-gradient-to-r from-accent to-accent2 font-display font-semibold text-accent-foreground" : "text-muted-foreground"}`}
           >
             {label}
           </button>

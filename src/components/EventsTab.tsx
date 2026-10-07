@@ -133,7 +133,7 @@ export function EventsTab() {
               <FileDown className="size-4" /> Rapport de présence (PDF)
             </button>
             {selected.closed_at ? (
-              <p className="rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-muted-foreground">
+              <p className="rounded-xl border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
                 Événement terminé le {new Date(selected.closed_at).toLocaleString()} : les QR codes et les accès ont été supprimés. Seul le rapport reste disponible.
               </p>
             ) : (<>
@@ -147,7 +147,7 @@ export function EventsTab() {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1500);
                   }}
-                  className="inline-flex items-center gap-1 rounded-xl border border-white/10 px-3 text-sm text-accent"
+                  className="inline-flex items-center gap-1 rounded-xl border border-border px-3 text-sm text-accent"
                 >
                   <Copy className="size-4" /> {copied ? "Copié" : "Copier"}
                 </button>
@@ -184,18 +184,18 @@ export function EventsTab() {
               <button
                 key={e.id}
                 onClick={() => setSelectedId(e.id)}
-                className={`w-full rounded-2xl border p-4 text-left ${e.id === selectedId ? "border-accent/50 bg-accent/10" : "border-white/10 bg-white/5 hover:bg-white/10"}`}
+                className={`w-full rounded-2xl border p-4 text-left ${e.id === selectedId ? "border-accent/50 bg-accent/10" : "border-border bg-muted/50 hover:bg-muted"}`}
               >
                 <div className="flex items-baseline justify-between">
                   <span className="font-semibold">{e.title}</span>
                   <span className="font-display text-sm">
                     {e.current_count}
-                    <span className="text-white/30">/{e.max_capacity}</span>
+                    <span className="text-muted-foreground/60">/{e.max_capacity}</span>
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {new Date(e.date).toLocaleString()}
-                  {e.closed_at && <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5">Terminé</span>}
+                  {e.closed_at && <span className="ml-2 rounded-full bg-muted px-2 py-0.5">Terminé</span>}
                 </p>
               </button>
             ))}

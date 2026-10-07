@@ -125,13 +125,13 @@ export function ScannerTab() {
             onChange={(e) => setEventId(e.target.value)}
           >
             {events.data?.map((e) => (
-              <option key={e.id} value={e.id} className="bg-panel">
+              <option key={e.id} value={e.id}>
                 {e.title}
               </option>
             ))}
           </select>
 
-          <div className="relative grid aspect-square place-items-center overflow-hidden rounded-2xl border border-white/10 bg-ink/50">
+          <div className="relative grid aspect-square place-items-center overflow-hidden rounded-2xl border border-border bg-muted/40">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/10 to-transparent" />
             {!cameraOn && (
               <div className="pointer-events-none absolute inset-x-0 h-16 animate-scanline bg-gradient-to-b from-transparent via-accent/40 to-transparent" />
@@ -139,10 +139,10 @@ export function ScannerTab() {
             <div id="qr-camera" className="size-full" />
             {!cameraOn && (
               <div className="absolute inset-0 grid place-items-center">
-                <ScanLine className="size-16 text-white/20" />
+                <ScanLine className="size-16 text-muted-foreground/40" />
               </div>
             )}
-            <span className="absolute bottom-3 text-[11px] uppercase tracking-[0.2em] text-white/40">
+            <span className="absolute bottom-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
               Scan to admit
             </span>
           </div>
@@ -163,7 +163,7 @@ export function ScannerTab() {
             </button>
             <button
               onClick={() => setCameraOn((v) => !v)}
-              className="rounded-xl border border-white/15 p-3 text-white/70"
+              className="rounded-xl border border-border p-3 text-muted-foreground"
               aria-label="Toggle camera"
             >
               {cameraOn ? <CameraOff className="size-4" /> : <Camera className="size-4" />}
@@ -188,7 +188,7 @@ export function ScannerTab() {
                       ? "TICKET ALREADY USED"
                       : "INVALID TICKET"}
               </p>
-              <p className="mt-1 font-mono text-xs text-white/50">
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
                 {last.ticket_code ?? "—"} {last.guest_name ? `· ${last.guest_name}` : ""}
               </p>
             </div>
@@ -202,25 +202,25 @@ export function ScannerTab() {
             <span className="field-label">Capacity</span>
             <span className="font-display text-3xl font-bold">
               {inside}
-              <span className="text-base text-white/30">/{capacity}</span>
+              <span className="text-base text-muted-foreground/60">/{capacity}</span>
             </span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-white/10">
+          <div className="h-3 overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-gradient-to-r from-accent to-accent2 transition-[width] duration-300"
               style={{ width: `${pct}%` }}
             />
           </div>
           <div className="mt-4 grid grid-cols-3 gap-3">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-xl border border-border bg-muted/50 p-4">
               <p className="field-label">Inside</p>
               <p className="font-display text-3xl font-bold text-mint">{inside}</p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-xl border border-border bg-muted/50 p-4">
               <p className="field-label">Capacity</p>
               <p className="font-display text-3xl font-bold">{capacity}</p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-xl border border-border bg-muted/50 p-4">
               <p className="field-label">Remaining</p>
               <p className="font-display text-3xl font-bold text-amber">{remaining}</p>
             </div>
@@ -245,7 +245,7 @@ export function ScannerTab() {
 
       {pending && (
         <div className="fixed inset-0 z-50 grid place-items-center p-6">
-          <div className="absolute inset-0 bg-ink/80" />
+          <div className="absolute inset-0 bg-background/80" />
           <div className="relative w-full max-w-md animate-slam rounded-3xl border border-rose/40 bg-gradient-to-br from-rose/15 to-amber/10 p-6 backdrop-blur-xl">
             <div className="mb-3 flex items-center gap-2">
               <span className="size-2 animate-softpulse rounded-full bg-rose" />
@@ -253,7 +253,7 @@ export function ScannerTab() {
                 ⚠️ Capacity limit reached! ({pending.current_count}/{pending.max_capacity})
               </p>
             </div>
-            <p className="mb-5 text-sm text-white/70">
+            <p className="mb-5 text-sm text-muted-foreground">
               Ticket <span className="font-mono text-foreground">{pending.ticket_code}</span>
               {pending.guest_name ? ` · ${pending.guest_name}` : ""} was scanned beyond the booked
               capacity. Choose how to handle this guest.

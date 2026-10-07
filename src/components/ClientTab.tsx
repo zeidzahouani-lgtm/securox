@@ -40,12 +40,12 @@ export function TicketQr({
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   return (
-    <div className="rounded-2xl border border-white/10 bg-ink/40 p-3">
+    <div className="rounded-2xl border border-border bg-muted/40 p-3">
       <div className="mb-2 grid place-items-center rounded-lg bg-white p-2">
         <QRCodeCanvas ref={ref} value={code} size={140} marginSize={2} />
       </div>
       <p className="font-semibold">{guestName}</p>
-      <p className="font-mono text-[11px] text-white/60">{code}</p>
+      <p className="font-mono text-[11px] text-muted-foreground">{code}</p>
       <div className="mt-2 flex items-center gap-3 no-print">
         <button
           onClick={() => ref.current && downloadTicketJpg(ref.current, guestName, code)}
@@ -118,7 +118,7 @@ export function ClientTab({ initialEventId }: { initialEventId?: string | null |
           </select>
           {event && (
             <span className="font-display text-sm">
-              {list.length}<span className="text-white/30">/{event.max_capacity}</span> QR codes
+              {list.length}<span className="text-muted-foreground/60">/{event.max_capacity}</span> QR codes
             </span>
           )}
         </div>
