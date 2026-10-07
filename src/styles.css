@@ -2,7 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 /*
  * Dravox Access design system — kinetic glass.
@@ -45,41 +45,70 @@
   --color-mint: var(--mint);
   --color-amber: var(--amber);
   --color-rose: var(--rose);
+  --color-glow: var(--glow);
+  --color-glow2: var(--glow2);
 
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: "Sora", sans-serif;
+  --font-body: "Manrope", sans-serif;
 }
 
 :root {
-  --radius: 0.75rem;
-
-  --ink: oklch(0.14 0.024 265);
-  --panel: oklch(0.2 0.032 265);
-  --line: oklch(0.3 0.042 265);
-  --accent2: oklch(0.72 0.152 293);
-  --mint: oklch(0.77 0.148 163);
-  --amber: oklch(0.83 0.161 82);
-  --rose: oklch(0.71 0.166 13);
-
+  --radius: 0.85rem;
+  --ink: oklch(0.985 0.004 250);
+  --panel: oklch(1 0 0);
+  --line: oklch(0.91 0.01 255);
+  --accent2: oklch(0.68 0.17 155);
+  --mint: oklch(0.62 0.16 155);
+  --amber: oklch(0.7 0.16 70);
+  --rose: oklch(0.6 0.2 20);
   --background: var(--ink);
-  --foreground: oklch(1 0 0);
+  --foreground: oklch(0.2 0.03 260);
   --card: var(--panel);
-  --card-foreground: oklch(1 0 0);
+  --card-foreground: var(--foreground);
   --popover: var(--panel);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.79 0.135 205);
-  --primary-foreground: var(--ink);
-  --secondary: oklch(0.25 0.035 265);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.25 0.035 265);
-  --muted-foreground: oklch(0.68 0.022 265);
-  --accent: oklch(0.79 0.135 205);
-  --accent-foreground: var(--ink);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.55 0.19 258);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.01 255);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.95 0.008 255);
+  --muted-foreground: oklch(0.5 0.025 260);
+  --accent: oklch(0.55 0.19 258);
+  --accent-foreground: oklch(1 0 0);
   --destructive: var(--rose);
-  --destructive-foreground: var(--ink);
+  --destructive-foreground: oklch(1 0 0);
   --border: var(--line);
   --input: var(--line);
-  --ring: oklch(0.79 0.135 205);
+  --ring: var(--primary);
+  --glass: color-mix(in oklab, white 80%, transparent);
+  --glass-line: oklch(0.9 0.012 255);
+  --glow: oklch(0.55 0.19 258 / 0.12);
+  --glow2: oklch(0.68 0.17 155 / 0.12);
+  --shadow-panel: 0 1px 2px oklch(0.2 0.03 260 / 0.04), 0 12px 32px -12px oklch(0.3 0.08 260 / 0.15);
+}
+
+.dark {
+  --ink: oklch(0.15 0.025 262);
+  --panel: oklch(0.2 0.03 262);
+  --line: oklch(0.3 0.035 262);
+  --accent2: oklch(0.78 0.18 155);
+  --mint: oklch(0.8 0.17 155);
+  --amber: oklch(0.83 0.16 80);
+  --rose: oklch(0.7 0.18 18);
+  --foreground: oklch(0.97 0.005 260);
+  --secondary: oklch(0.25 0.03 262);
+  --muted: oklch(0.25 0.03 262);
+  --muted-foreground: oklch(0.7 0.02 262);
+  --primary: oklch(0.7 0.17 250);
+  --primary-foreground: oklch(0.15 0.025 262);
+  --accent: oklch(0.7 0.17 250);
+  --accent-foreground: oklch(0.15 0.025 262);
+  --destructive-foreground: oklch(0.15 0.025 262);
+  --glass: color-mix(in oklab, oklch(0.22 0.03 262) 70%, transparent);
+  --glass-line: oklch(1 0 0 / 0.08);
+  --glow: oklch(0.7 0.17 250 / 0.22);
+  --glow2: oklch(0.78 0.18 155 / 0.16);
+  --shadow-panel: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 20px 40px -20px oklch(0 0 0 / 0.6);
 }
 
 @layer base {
@@ -134,26 +163,30 @@
 }
 
 @utility glass-panel {
-  background-color: color-mix(in oklab, white 4%, transparent);
-  border: 1px solid color-mix(in oklab, white 10%, transparent);
-  backdrop-filter: blur(24px);
+  background-color: var(--glass);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(20px);
 }
 
 @utility field-input {
   width: 100%;
-  background-color: color-mix(in oklab, var(--ink) 40%, transparent);
-  border: 1px solid color-mix(in oklab, white 10%, transparent);
+  background-color: var(--muted);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   font-size: 0.875rem;
   color: var(--foreground);
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--glow); }
 }
 @utility field-label {
   font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: color-mix(in oklab, white 40%, transparent);
+  letter-spacing: 0.14em;
+  color: var(--muted-foreground);
 }
 
 @media print {

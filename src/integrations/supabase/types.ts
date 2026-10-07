@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_pins: {
+        Row: {
+          failed: number
+          locked_until: string | null
+          pin: string
+          role: string
+        }
+        Insert: {
+          failed?: number
+          locked_until?: string | null
+          pin: string
+          role: string
+        }
+        Update: {
+          failed?: number
+          locked_until?: string | null
+          pin?: string
+          role?: string
+        }
+        Relationships: []
+      }
       attendees: {
         Row: {
           checked_in_at: string | null
@@ -202,6 +223,7 @@ export type Database = {
         Returns: boolean
       }
       resolve_login: { Args: { _username: string }; Returns: string }
+      set_pin: { Args: { _pin: string; _role: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "scanner" | "client"
