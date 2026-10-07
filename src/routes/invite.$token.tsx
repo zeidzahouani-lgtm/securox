@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Loader2, Printer } from "lucide-react";
+import { AlertTriangle, Loader2, Plus, Printer } from "lucide-react";
 import { Frame } from "@/components/AppShell";
 import { TicketQr } from "@/components/ClientTab";
-import { inviteAdd, inviteDelete, inviteGet } from "@/lib/gate";
+import { inviteAdd, inviteDelete, inviteExtend, inviteGet } from "@/lib/gate";
 
 export const Route = createFileRoute("/invite/$token")({
   head: () => ({
@@ -35,6 +35,13 @@ function InvitePage() {
     mutationFn: () =>
       mode === "named" ? inviteAdd(token, first.trim(), last.trim(), 1) : inviteAdd(token, "", "", count),
     onSuccess: () => { setFirst(""); setLast(""); qc.invalidateQueries({ queryKey: key }); },
+    onError: (e: Error) => setErr(e.message),
+  });
+  const [more, setMore] = useState(5);
+  const [askMore, setAskMore] = useState(false);
+  const extend = useMutation({
+    mutationFn: () => inviteExtend(token, more),
+    onSuccess: () => { setAskMore(false); qc.invalidateQueries({ queryKey: key }); },
     onError: (e: Error) => setErr(e.message),
   });
   const remove = useMutation({
@@ -86,6 +93,27 @@ function InvitePage() {
             </button>
           </form>
           <p className="mt-3 text-sm text-muted-foreground">{left > 0 ? `Il reste ${left} QR code(s).` : "Tous les QR codes ont été créés."}</p>
+          {ev.extra_capacity > 0 && (
+            <p className="mt-2 text-sm text-amber">{ev.extra_capacity} place(s) supplémentaire(s) ajoutée(s) — elles seront facturées.</p>
+          )}
+          {!askMore ? (
+            <button type="button" onClick={() => setAskMore(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold text-accent hover:bg-muted">
+              <Plus className="size-4" /> Ajouter des personnes
+            </button>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-amber/40 bg-amber/10 p-4">
+              <p className="flex items-start gap-2 text-sm"><AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber" />
+                Les places ajoutées au-delà du nombre prévu seront <b>facturées en supplément</b>. Elles sont disponibles tout de suite.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <input type="number" min={1} max={1000} className="field-input w-28" value={more} onChange={(e) => setMore(Math.max(1, Number(e.target.value) || 1))} />
+                <button type="button" disabled={extend.isPending} onClick={() => { setErr(null); extend.mutate(); }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber to-rose px-4 py-2 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
+                  {extend.isPending && <Loader2 className="size-4 animate-spin" />} J'accepte, ajouter {more} place(s)
+                </button>
+                <button type="button" onClick={() => setAskMore(false)} className="px-3 text-sm text-muted-foreground">Annuler</button>
+              </div>
+            </div>
+          )}
           {err && <p className="mt-2 text-sm text-rose">{err}</p>}
         </div>
 

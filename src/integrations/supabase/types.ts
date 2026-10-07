@@ -110,6 +110,7 @@ export type Database = {
           current_count: number
           date: string
           end_date: string | null
+          extra_capacity: number
           id: string
           invite_token: string
           max_capacity: number
@@ -123,6 +124,7 @@ export type Database = {
           current_count?: number
           date: string
           end_date?: string | null
+          extra_capacity?: number
           id?: string
           invite_token?: string
           max_capacity: number
@@ -136,6 +138,7 @@ export type Database = {
           current_count?: number
           date?: string
           end_date?: string | null
+          extra_capacity?: number
           id?: string
           invite_token?: string
           max_capacity?: number
@@ -212,6 +215,10 @@ export type Database = {
       invite_delete: {
         Args: { _id: string; _token: string }
         Returns: undefined
+      }
+      invite_extend: {
+        Args: { _extra: number; _token: string }
+        Returns: number
       }
       invite_get: { Args: { _token: string }; Returns: Json }
       is_event_client: {

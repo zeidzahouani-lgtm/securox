@@ -30,7 +30,8 @@ export async function downloadEventReport(event: EventRow, live: AttendeeRow[]) 
   const lines = [
     `Événement : ${event.title}`,
     `Début : ${fmt(event.date)}   Fin : ${fmt(event.end_date)}`,
-    `Capacité prévue : ${event.max_capacity}`,
+    `Capacité initiale : ${event.max_capacity - (event.extra_capacity ?? 0)}`,
+    `Places supplémentaires demandées par le client (à facturer) : ${event.extra_capacity ?? 0}`,
     `QR codes générés : ${report.generated}`,
     `Entrées totales : ${report.checked_in + report.over_limit}`,
     `Entrées hors quota (à facturer) : ${report.over_limit}`,
