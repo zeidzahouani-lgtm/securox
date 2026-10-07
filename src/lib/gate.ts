@@ -12,6 +12,7 @@ export type EventRow = {
   end_date: string | null;
   closed_at: string | null;
   report: EventReport | null;
+  extra_capacity?: number;
 };
 
 export type EventReport = {
@@ -216,7 +217,7 @@ export async function scanTicket(
 }
 
 export type InviteData = {
-  id: string; title: string; date: string; end_date: string | null; max_capacity: number;
+  id: string; title: string; date: string; end_date: string | null; max_capacity: number; extra_capacity: number;
   attendees: Pick<AttendeeRow, "id" | "ticket_code" | "first_name" | "last_name" | "guest_name" | "status">[];
 };
 export async function inviteGet(token: string): Promise<InviteData> {
@@ -230,5 +231,10 @@ export async function inviteAdd(token: string, first: string, last: string, coun
 }
 export async function inviteDelete(token: string, id: string) {
   const { error } = await (supabase.rpc as any)("invite_delete", { _token: token, _id: id });
+  if (error) throw error;
+}
+
+export async function inviteExtend(token: string, extra: number) {
+  const { error } = await (supabase.rpc as any)("invite_extend", { _token: token, _extra: extra });
   if (error) throw error;
 }
