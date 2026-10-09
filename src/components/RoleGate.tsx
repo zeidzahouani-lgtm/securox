@@ -40,7 +40,7 @@ export function RoleGate() {
           <p className="mb-3 font-mono text-xs font-semibold text-primary">SECUROX</p>
           <h1 className="font-display text-4xl font-bold md:text-5xl">Vos espaces<span className="text-primary">.</span></h1>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {CARDS.map(({ k, icon: Icon, title }, i) => (
             <Button variant="outline" key={k} onClick={() => setPick(k)}
               className="group relative flex h-64 flex-col items-start justify-between whitespace-normal border-border bg-card p-6 text-left text-foreground hover:border-primary hover:bg-primary/5 hover:text-foreground">
@@ -61,15 +61,7 @@ export function RoleGate() {
       <Button variant="ghost" onClick={() => { setPick(null); setErr(null); }} className="mb-6 px-0 text-muted-foreground">
         <ArrowLeft className="size-4" /> Retour
       </Button>
-      {pick === "client" ? (
-        <form onSubmit={openLink} className="space-y-4">
-          {ActiveIcon && <ActiveIcon className="size-24 text-primary" strokeWidth={1.4} />}
-          <h2 className="font-display text-2xl font-bold">Espace client</h2>
-          <p className="text-sm text-muted-foreground">Collez le lien reçu de l'organisateur.</p>
-          <input required className="field-input" placeholder="https://…/invite/…" value={link} onChange={(e) => setLink(e.target.value)} />
-          <Button type="submit" className="h-12 w-full font-semibold">Ouvrir</Button>
-        </form>
-      ) : (
+      {pick && (
         <form onSubmit={submitPin} className="space-y-4">
           {ActiveIcon && <ActiveIcon className="size-24 text-primary" strokeWidth={1.4} />}
           <h2 className="font-display text-2xl font-bold">{pick === "admin" ? "Admin" : "Scanner"}</h2>
