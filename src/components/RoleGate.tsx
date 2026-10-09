@@ -1,27 +1,23 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowUpRight, Loader2, QrCode, ScanLine, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Loader2, ScanLine, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin.functions";
 
-type Pick = "admin" | "scanner" | "client" | null;
+type Pick = "admin" | "scanner" | null;
 
 const CARDS = [
   { k: "admin", icon: ShieldCheck, title: "Admin", desc: "Créer les événements, suivre les entrées, rapports PDF." },
   { k: "scanner", icon: ScanLine, title: "Scanner", desc: "Contrôler l'accès à l'entrée avec compteur en direct." },
-  { k: "client", icon: QrCode, title: "Client", desc: "Générer les QR codes de vos invités via votre lien." },
 ] as const;
 
 export function RoleGate() {
   const [pick, setPick] = useState<Pick>(null);
   const [pin, setPin] = useState("");
-  const [link, setLink] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const login = useServerFn(pinLogin);
-  const navigate = useNavigate();
   const ActiveIcon = pick ? CARDS.find((c) => c.k === pick)!.icon : null;
 
   async function submitPin(e: React.FormEvent) {
