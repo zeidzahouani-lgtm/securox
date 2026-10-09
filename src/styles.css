@@ -5,7 +5,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Dravox Access design system — signal red.
+ * Securox design system — signal red.
  * All colors are oklch tokens. Never hardcode colors in components.
  */
 
