@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { KeyRound, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +8,9 @@ function PinPanel({ role, label }: { role: "admin" | "scanner"; label: string })
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null);
   return (
-    <div className="glass-panel rounded-3xl p-6">
+    <div className="glass-panel rounded-lg p-6">
       <div className="mb-4 flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-xl bg-accent/15 text-accent"><KeyRound className="size-5" /></span>
+        <span className="grid size-10 place-items-center rounded-md bg-accent/15 text-accent"><KeyRound className="size-5" /></span>
         <h2 className="font-display text-xl font-bold">PIN {label}</h2>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">Code demandé pour entrer dans l'espace {label}. 4 à 8 chiffres.</p>
@@ -22,10 +23,10 @@ function PinPanel({ role, label }: { role: "admin" | "scanner"; label: string })
       }}>
         <input inputMode="numeric" maxLength={8} className="field-input font-mono tracking-[0.3em]" placeholder="Nouveau PIN"
           value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} />
-        <button disabled={busy || pin.length < 4}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-5 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
+        <Button variant="ghost" disabled={busy || pin.length < 4}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-5 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
           {busy && <Loader2 className="size-4 animate-spin" />} Changer
-        </button>
+        </Button>
       </form>
       {msg && <p className={`mt-3 text-sm ${msg.ok ? "text-mint" : "text-rose"}`}>{msg.t}</p>}
     </div>

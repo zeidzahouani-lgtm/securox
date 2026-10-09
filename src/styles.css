@@ -5,7 +5,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Dravox Access design system — kinetic glass.
+ * Dravox Access design system — signal red.
  * All colors are oklch tokens. Never hardcode colors in components.
  */
 
@@ -47,68 +47,71 @@
   --color-rose: var(--rose);
   --color-glow: var(--glow);
   --color-glow2: var(--glow2);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
+  --color-header-muted: var(--header-muted);
+  --color-paper: var(--paper);
 
   --font-display: "Sora", sans-serif;
   --font-body: "Manrope", sans-serif;
 }
 
 :root {
-  --radius: 0.85rem;
-  --ink: oklch(0.985 0.004 250);
+  --radius: 0.5rem;
+  --ink: oklch(0.975 0 0);
   --panel: oklch(1 0 0);
-  --line: oklch(0.91 0.01 255);
-  --accent2: oklch(0.68 0.17 155);
-  --mint: oklch(0.62 0.16 155);
-  --amber: oklch(0.7 0.16 70);
-  --rose: oklch(0.6 0.2 20);
+  --line: oklch(0.87 0 0);
+  --accent2: oklch(0.48 0.2 26);
+  --mint: oklch(0.48 0.13 155);
+  --amber: oklch(0.54 0.13 65);
+  --rose: oklch(0.55 0.22 26);
   --background: var(--ink);
-  --foreground: oklch(0.2 0.03 260);
+  --foreground: oklch(0.17 0 0);
   --card: var(--panel);
   --card-foreground: var(--foreground);
   --popover: var(--panel);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.55 0.19 258);
+  --primary: oklch(0.55 0.22 26);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.01 255);
-  --secondary-foreground: var(--foreground);
-  --muted: oklch(0.95 0.008 255);
-  --muted-foreground: oklch(0.5 0.025 260);
-  --accent: oklch(0.55 0.19 258);
-  --accent-foreground: oklch(1 0 0);
+  --secondary: oklch(0.2 0 0);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.47 0 0);
+  --accent: var(--primary);
+  --accent-foreground: var(--primary-foreground);
   --destructive: var(--rose);
-  --destructive-foreground: oklch(1 0 0);
+  --destructive-foreground: var(--primary-foreground);
   --border: var(--line);
   --input: var(--line);
   --ring: var(--primary);
-  --glass: color-mix(in oklab, white 80%, transparent);
-  --glass-line: oklch(0.9 0.012 255);
-  --glow: oklch(0.55 0.19 258 / 0.12);
-  --glow2: oklch(0.68 0.17 155 / 0.12);
-  --shadow-panel: 0 1px 2px oklch(0.2 0.03 260 / 0.04), 0 12px 32px -12px oklch(0.3 0.08 260 / 0.15);
+  --glass: var(--panel);
+  --glass-line: var(--line);
+  --glow: oklch(0.55 0.22 26 / 0.12);
+  --glow2: oklch(0.55 0.22 26 / 0.06);
+  --shadow-panel: 0 2px 8px oklch(0 0 0 / 0.04);
+  --header: oklch(0.13 0 0);
+  --header-foreground: oklch(0.98 0 0);
+  --header-muted: oklch(0.67 0 0);
+  --paper: oklch(1 0 0);
 }
 
 .dark {
-  --ink: oklch(0.15 0.025 262);
-  --panel: oklch(0.2 0.03 262);
-  --line: oklch(0.3 0.035 262);
-  --accent2: oklch(0.78 0.18 155);
-  --mint: oklch(0.8 0.17 155);
-  --amber: oklch(0.83 0.16 80);
-  --rose: oklch(0.7 0.18 18);
-  --foreground: oklch(0.97 0.005 260);
-  --secondary: oklch(0.25 0.03 262);
-  --muted: oklch(0.25 0.03 262);
-  --muted-foreground: oklch(0.7 0.02 262);
-  --primary: oklch(0.7 0.17 250);
-  --primary-foreground: oklch(0.15 0.025 262);
-  --accent: oklch(0.7 0.17 250);
-  --accent-foreground: oklch(0.15 0.025 262);
-  --destructive-foreground: oklch(0.15 0.025 262);
-  --glass: color-mix(in oklab, oklch(0.22 0.03 262) 70%, transparent);
-  --glass-line: oklch(1 0 0 / 0.08);
-  --glow: oklch(0.7 0.17 250 / 0.22);
-  --glow2: oklch(0.78 0.18 155 / 0.16);
-  --shadow-panel: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 20px 40px -20px oklch(0 0 0 / 0.6);
+  --ink: oklch(0.13 0 0);
+  --panel: oklch(0.18 0 0);
+  --line: oklch(0.3 0 0);
+  --accent2: oklch(0.52 0.21 26);
+  --mint: oklch(0.76 0.14 155);
+  --amber: oklch(0.8 0.13 75);
+  --rose: oklch(0.7 0.18 26);
+  --foreground: oklch(0.96 0 0);
+  --secondary: oklch(0.26 0 0);
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.68 0 0);
+  --primary: oklch(0.6 0.23 26);
+  --primary-foreground: oklch(1 0 0);
+  --glow: oklch(0.6 0.23 26 / 0.18);
+  --glow2: oklch(0.6 0.23 26 / 0.08);
+  --shadow-panel: 0 2px 8px oklch(0 0 0 / 0.12);
 }
 
 @layer base {
@@ -166,7 +169,7 @@
   background-color: var(--glass);
   border: 1px solid var(--glass-line);
   box-shadow: var(--shadow-panel);
-  backdrop-filter: blur(20px);
+  border-radius: 8px;
 }
 
 @utility field-input {
@@ -185,11 +188,26 @@
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0;
   color: var(--muted-foreground);
 }
 
 @media print {
   .no-print { display: none !important; }
   .print-area { position: static !important; }
+}
+
+@layer base {
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
+  h1, h2, h3 { letter-spacing: 0; }
+  button, input, select { min-width: 0; }
+  input[type="datetime-local"] { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+@media (max-width: 640px) {
+  .glass-panel { padding: 1rem; }
+  .field-input { padding-inline: 0.65rem; }
 }

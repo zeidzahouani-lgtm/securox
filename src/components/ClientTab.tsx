@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QRCodeCanvas } from "qrcode.react";
 import { useEffect, useRef, useState } from "react";
@@ -40,24 +41,24 @@ export function TicketQr({
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   return (
-    <div className="rounded-2xl border border-border bg-muted/40 p-3">
-      <div className="mb-2 grid place-items-center rounded-lg bg-white p-2">
+    <div className="rounded-lg border border-border bg-muted/40 p-3">
+      <div className="mb-2 grid place-items-center rounded-lg bg-paper p-2">
         <QRCodeCanvas ref={ref} value={code} size={140} marginSize={2} />
       </div>
-      <p className="font-semibold">{guestName}</p>
-      <p className="font-mono text-[11px] text-muted-foreground">{code}</p>
+      <p className="break-words font-semibold">{guestName}</p>
+      <p className="break-all font-mono text-[11px] text-muted-foreground">{code}</p>
       <div className="mt-2 flex items-center gap-3 no-print">
-        <button
+        <Button variant="ghost"
           onClick={() => ref.current && downloadTicketJpg(ref.current, guestName, code)}
           className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
           aria-label="Télécharger en JPG"
         >
           <Download className="size-3.5" /> JPG
-        </button>
+        </Button>
         {status === "Pending" && (
-          <button onClick={onRemove} className="text-rose" aria-label="Supprimer">
+          <Button variant="ghost" onClick={onRemove} className="text-rose" aria-label="Supprimer">
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -101,7 +102,7 @@ export function ClientTab({ initialEventId }: { initialEventId?: string | null |
 
   if (!events.isLoading && !events.data?.length) {
     return (
-      <div className="glass-panel rounded-3xl p-6 text-sm text-muted-foreground">
+      <div className="glass-panel rounded-lg p-6 text-sm text-muted-foreground">
         Aucun événement. Ouvrez le lien envoyé par l'organisateur pour y accéder.
       </div>
     );
@@ -109,7 +110,7 @@ export function ClientTab({ initialEventId }: { initialEventId?: string | null |
 
   return (
     <div className="space-y-6">
-      <div className="glass-panel rounded-3xl p-6 no-print">
+      <div className="glass-panel rounded-lg p-6 no-print">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <select className="field-input w-auto" value={eventId ?? ""} onChange={(e) => setEventId(e.target.value)}>
             {events.data?.map((e) => (
@@ -132,21 +133,21 @@ export function ClientTab({ initialEventId }: { initialEventId?: string | null |
         >
           <input required maxLength={60} className="field-input" placeholder="Prénom" value={first} onChange={(e) => setFirst(e.target.value)} />
           <input required maxLength={60} className="field-input" placeholder="Nom" value={last} onChange={(e) => setLast(e.target.value)} />
-          <button disabled={add.isPending || full || !first.trim() || !last.trim()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
+          <Button variant="ghost" disabled={add.isPending || full || !first.trim() || !last.trim()} className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
             {add.isPending && <Loader2 className="size-4 animate-spin" />}
             Générer le QR code
-          </button>
+          </Button>
         </form>
         {full && event && <p className="mt-3 text-sm text-amber">Tous les QR codes disponibles ont été créés.</p>}
         {err && <p className="mt-3 text-sm text-rose">{err}</p>}
       </div>
 
-      <div className="glass-panel rounded-3xl p-6 print-area">
+      <div className="glass-panel rounded-lg p-6 print-area">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-display text-lg font-semibold">{event?.title}</h3>
-          <button onClick={() => window.print()} className="text-accent no-print" aria-label="Imprimer">
+          <Button variant="ghost" onClick={() => window.print()} className="text-accent no-print" aria-label="Imprimer">
             <Printer className="size-4" />
-          </button>
+          </Button>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
           {list.map((t) => (
