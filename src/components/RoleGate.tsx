@@ -52,8 +52,13 @@ export function RoleGate() {
         <div className="grid gap-4 md:grid-cols-3">
           {CARDS.map(({ k, icon: Icon, title }, i) => (
             <Button variant="outline" key={k} onClick={() => setPick(k)}
-              className="group relative flex h-60 flex-col items-start justify-between whitespace-normal border-border bg-card p-6 text-left text-foreground hover:border-primary hover:bg-primary/5 hover:text-foreground">
-              <div className="flex w-full items-center justify-between"><Icon className="size-8 text-primary" /><span className="font-mono text-xs text-muted-foreground">0{i + 1}</span></div>
+              className="group relative flex h-64 flex-col items-start justify-between whitespace-normal border-border bg-card p-6 text-left text-foreground hover:border-primary hover:bg-primary/5 hover:text-foreground">
+              <div className="flex w-full items-start justify-between">
+                <span className="grid size-28 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary transition-colors group-hover:border-primary group-hover:bg-primary/20">
+                  <Icon className="size-16" strokeWidth={1.5} />
+                </span>
+                <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
+              </div>
               <div className="flex w-full items-center justify-between border-t border-border pt-5"><span className="font-display text-2xl font-semibold">{title}</span><ArrowUpRight className="size-5 text-primary transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" /></div>
             </Button>
           ))}
