@@ -55,9 +55,7 @@ export function RoleGate() {
             <Button variant="outline" key={k} onClick={() => setPick(k)}
               className="group relative flex h-64 flex-col items-start justify-between whitespace-normal border-border bg-card p-6 text-left text-foreground hover:border-primary hover:bg-primary/5 hover:text-foreground">
               <div className="flex w-full items-start justify-between">
-                <span className="grid size-28 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary transition-colors group-hover:border-primary group-hover:bg-primary/20">
-                  <Icon className="!size-16" strokeWidth={1.5} />
-                </span>
+                <Icon className="!size-28 text-primary" strokeWidth={1.4} />
                 <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
               </div>
               <div className="flex w-full items-center justify-between border-t border-border pt-5"><span className="font-display text-2xl font-semibold">{title}</span><ArrowUpRight className="size-5 text-primary transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" /></div>
@@ -75,7 +73,7 @@ export function RoleGate() {
       </Button>
       {pick === "client" ? (
         <form onSubmit={openLink} className="space-y-4">
-          {ActiveIcon && <span className="grid size-20 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary"><ActiveIcon className="size-12" strokeWidth={1.5} /></span>}
+          {ActiveIcon && <ActiveIcon className="size-24 text-primary" strokeWidth={1.4} />}
           <h2 className="font-display text-2xl font-bold">Espace client</h2>
           <p className="text-sm text-muted-foreground">Collez le lien reçu de l'organisateur.</p>
           <input required className="field-input" placeholder="https://…/invite/…" value={link} onChange={(e) => setLink(e.target.value)} />
@@ -83,7 +81,7 @@ export function RoleGate() {
         </form>
       ) : (
         <form onSubmit={submitPin} className="space-y-4">
-          {ActiveIcon && <span className="grid size-20 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary"><ActiveIcon className="size-12" strokeWidth={1.5} /></span>}
+          {ActiveIcon && <ActiveIcon className="size-24 text-primary" strokeWidth={1.4} />}
           <h2 className="font-display text-2xl font-bold">{pick === "admin" ? "Admin" : "Scanner"}</h2>
           <p className="text-sm text-muted-foreground">Entrez le code PIN.</p>
           <input autoFocus inputMode="numeric" type="password" maxLength={8} required
