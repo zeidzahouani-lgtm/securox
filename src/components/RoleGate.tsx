@@ -56,7 +56,7 @@ export function RoleGate() {
               className="group relative flex h-64 flex-col items-start justify-between whitespace-normal border-border bg-card p-6 text-left text-foreground hover:border-primary hover:bg-primary/5 hover:text-foreground">
               <div className="flex w-full items-start justify-between">
                 <span className="grid size-28 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary transition-colors group-hover:border-primary group-hover:bg-primary/20">
-                  <Icon className="size-16" strokeWidth={1.5} />
+                  <Icon className="!size-16" strokeWidth={1.5} />
                 </span>
                 <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
               </div>
