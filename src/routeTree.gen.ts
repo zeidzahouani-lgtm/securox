@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminHotelRouteImport } from './routes/admin-hotel'
+import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminHotelRoute = AdminHotelRouteImport.update({
+  id: '/admin-hotel',
+  path: '/admin-hotel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScannerRoute = ScannerRouteImport.update({
+  id: '/scanner',
+  path: '/scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
@@ -25,27 +37,35 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-hotel': typeof AdminHotelRoute
+  '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-hotel': typeof AdminHotelRoute
+  '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin-hotel': typeof AdminHotelRoute
+  '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/invite/$token'
+  fullPaths: '/' | '/admin-hotel' | '/scanner' | '/invite/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/invite/$token'
-  id: '__root__' | '/' | '/invite/$token'
+  to: '/' | '/admin-hotel' | '/scanner' | '/invite/$token'
+  id: '__root__' | '/' | '/admin-hotel' | '/scanner' | '/invite/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminHotelRoute: typeof AdminHotelRoute
+  ScannerRoute: typeof ScannerRoute
   InviteTokenRoute: typeof InviteTokenRoute
 }
 
@@ -56,6 +76,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-hotel': {
+      id: '/admin-hotel'
+      path: '/admin-hotel'
+      fullPath: '/admin-hotel'
+      preLoaderRoute: typeof AdminHotelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scanner': {
+      id: '/scanner'
+      path: '/scanner'
+      fullPath: '/scanner'
+      preLoaderRoute: typeof ScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
@@ -70,6 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminHotelRoute: AdminHotelRoute,
+  ScannerRoute: ScannerRoute,
   InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport

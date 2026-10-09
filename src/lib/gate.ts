@@ -291,7 +291,7 @@ export async function closeEventNow(id: string) {
   await closeEndedEvents();
 }
 
-export type ImportRow = { first: string; last: string; email?: string; phone?: string };
+export type ImportRow = { first: string; last: string; email?: string | undefined; phone?: string | undefined };
 export async function inviteImport(token: string, rows: ImportRow[]) {
   const { error } = await (supabase.rpc as any)("invite_import", { _token: token, _rows: rows });
   if (error) throw error;
