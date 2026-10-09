@@ -13,6 +13,7 @@ export type EventRow = {
   closed_at: string | null;
   report: EventReport | null;
   extra_capacity?: number;
+  room?: string | null;
 };
 
 export type EventReport = {
@@ -45,7 +46,13 @@ export type ScanResult = {
     | "over_capacity"
     | "already"
     | "invalid"
-    | "no_event";
+    | "no_event"
+    | "wrong_event"
+    | "off_session"
+    | "duplicate_session";
+  expected_event?: string | null;
+  expected_room?: string | null;
+  session?: string | null;
   guest_name?: string | null;
   ticket_code?: string;
   current_count?: number;
@@ -82,6 +89,7 @@ export async function listAttendees(eventId: string): Promise<AttendeeRow[]> {
 
 export async function createEvent(input: {
   title: string;
+  room?: string;
   date: string;
   endDate: string;
   capacity: number;
@@ -91,6 +99,7 @@ export async function createEvent(input: {
     .from("events")
     .insert({
       title: input.title,
+      room: input.room || null,
       date: new Date(input.date).toISOString(),
       end_date: new Date(input.endDate).toISOString(),
       max_capacity: input.capacity,
@@ -217,8 +226,10 @@ export async function scanTicket(
 }
 
 export type InviteData = {
-  id: string; title: string; date: string; end_date: string | null; max_capacity: number; extra_capacity: number;
-  attendees: Pick<AttendeeRow, "id" | "ticket_code" | "first_name" | "last_name" | "guest_name" | "status">[];
+  id: string; title: string; room: string | null; date: string; end_date: string | null; max_capacity: number; extra_capacity: number;
+  current_count: number;
+  pending_requests: { id: string; extra: number; status: string; created_at: string }[];
+  attendees: Pick<AttendeeRow, "id" | "ticket_code" | "first_name" | "last_name" | "guest_name" | "status" | "checked_in_at">[];
 };
 export async function inviteGet(token: string): Promise<InviteData> {
   const { data, error } = await (supabase.rpc as any)("invite_get", { _token: token });
@@ -237,4 +248,60 @@ export async function inviteDelete(token: string, id: string) {
 export async function inviteExtend(token: string, extra: number) {
   const { error } = await (supabase.rpc as any)("invite_extend", { _token: token, _extra: extra });
   if (error) throw error;
+}
+
+export const MASTER_PREFIX = "SECUROX-EVENT:";
+
+export type SessionRow = { id: string; event_id: string; name: string; starts_at: string; ends_at: string };
+export async function listSessions(eventId: string): Promise<SessionRow[]> {
+  const { data, error } = await supabase.from("event_sessions").select("*").eq("event_id", eventId).order("starts_at");
+  if (error) throw error;
+  return (data ?? []) as SessionRow[];
+}
+export async function addSession(eventId: string, name: string, starts: string, ends: string) {
+  if (new Date(ends) <= new Date(starts)) throw new Error("La fin de la session doit être après le début");
+  const { error } = await supabase.from("event_sessions").insert({
+    event_id: eventId, name, starts_at: new Date(starts).toISOString(), ends_at: new Date(ends).toISOString(),
+  });
+  if (error) throw error;
+}
+export async function deleteSession(id: string) {
+  const { error } = await supabase.from("event_sessions").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export type CapacityRequest = { id: string; event_id: string; extra: number; status: string; created_at: string };
+export async function listRequests(): Promise<CapacityRequest[]> {
+  const { data, error } = await supabase.from("capacity_requests").select("*").order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as CapacityRequest[];
+}
+export async function decideRequest(id: string, approve: boolean) {
+  const { error } = await supabase.rpc("decide_capacity_request", { _id: id, _approve: approve });
+  if (error) throw error;
+}
+
+export async function updateEventRoom(id: string, room: string) {
+  const { error } = await supabase.from("events").update({ room: room || null }).eq("id", id);
+  if (error) throw error;
+}
+export async function closeEventNow(id: string) {
+  const { error } = await supabase.from("events").update({ end_date: new Date().toISOString() }).eq("id", id);
+  if (error) throw error;
+  await closeEndedEvents();
+}
+
+export type ImportRow = { first: string; last: string; email?: string | undefined; phone?: string | undefined };
+export async function inviteImport(token: string, rows: ImportRow[]) {
+  const { error } = await (supabase.rpc as any)("invite_import", { _token: token, _rows: rows });
+  if (error) throw error;
+}
+
+export async function scanTicketV2(ticketCode: string, eventId: string, force: boolean, sessionId: string | null, agent: string | null): Promise<ScanResult> {
+  const { data, error } = await (supabase.rpc as any)("check_in_ticket", {
+    _ticket_code: ticketCode.trim().toUpperCase(), _event_id: eventId, _force: force,
+    _session_id: sessionId, _agent: agent,
+  });
+  if (error) throw error;
+  return data as ScanResult;
 }

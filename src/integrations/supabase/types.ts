@@ -39,39 +39,80 @@ export type Database = {
         Row: {
           checked_in_at: string | null
           created_at: string
+          email: string | null
           event_id: string
           first_name: string | null
           guest_name: string | null
           id: string
           last_name: string | null
+          phone: string | null
           status: string
           ticket_code: string
         }
         Insert: {
           checked_in_at?: string | null
           created_at?: string
+          email?: string | null
           event_id: string
           first_name?: string | null
           guest_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           status?: string
           ticket_code: string
         }
         Update: {
           checked_in_at?: string | null
           created_at?: string
+          email?: string | null
           event_id?: string
           first_name?: string | null
           guest_name?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           status?: string
           ticket_code?: string
         }
         Relationships: [
           {
             foreignKeyName: "attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      capacity_requests: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          event_id: string
+          extra: number
+          id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          event_id: string
+          extra: number
+          id?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          event_id?: string
+          extra?: number
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_requests_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
@@ -102,6 +143,41 @@ export type Database = {
           },
         ]
       }
+      event_sessions: {
+        Row: {
+          created_at: string
+          ends_at: string
+          event_id: string
+          id: string
+          name: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          event_id: string
+          id?: string
+          name: string
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          event_id?: string
+          id?: string
+          name?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_sessions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           client_id: string | null
@@ -115,6 +191,7 @@ export type Database = {
           invite_token: string
           max_capacity: number
           report: Json | null
+          room: string | null
           title: string
         }
         Insert: {
@@ -129,6 +206,7 @@ export type Database = {
           invite_token?: string
           max_capacity: number
           report?: Json | null
+          room?: string | null
           title: string
         }
         Update: {
@@ -143,9 +221,59 @@ export type Database = {
           invite_token?: string
           max_capacity?: number
           report?: Json | null
+          room?: string | null
           title?: string
         }
         Relationships: []
+      }
+      passages: {
+        Row: {
+          agent: string | null
+          attendee_id: string
+          event_id: string
+          id: string
+          scanned_at: string
+          session_id: string | null
+        }
+        Insert: {
+          agent?: string | null
+          attendee_id: string
+          event_id: string
+          id?: string
+          scanned_at?: string
+          session_id?: string | null
+        }
+        Update: {
+          agent?: string | null
+          attendee_id?: string
+          event_id?: string
+          id?: string
+          scanned_at?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passages_attendee_id_fkey"
+            columns: ["attendee_id"]
+            isOneToOne: false
+            referencedRelation: "attendees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "event_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -195,11 +323,21 @@ export type Database = {
     }
     Functions: {
       check_in_ticket: {
-        Args: { _event_id: string; _force?: boolean; _ticket_code: string }
+        Args: {
+          _agent?: string
+          _event_id: string
+          _force?: boolean
+          _session_id?: string
+          _ticket_code: string
+        }
         Returns: Json
       }
       claim_event: { Args: { _token: string }; Returns: string }
       close_ended_events: { Args: never; Returns: number }
+      decide_capacity_request: {
+        Args: { _approve: boolean; _id: string }
+        Returns: undefined
+      }
       ensure_my_role: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -221,6 +359,7 @@ export type Database = {
         Returns: number
       }
       invite_get: { Args: { _token: string }; Returns: Json }
+      invite_import: { Args: { _rows: Json; _token: string }; Returns: number }
       is_event_client: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean

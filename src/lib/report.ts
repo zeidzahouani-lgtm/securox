@@ -28,7 +28,7 @@ export async function downloadEventReport(event: EventRow, live: AttendeeRow[]) 
   doc.setFontSize(11);
   const fmt = (d: string | null) => (d ? new Date(d).toLocaleString("fr-FR") : "—");
   const lines = [
-    `Événement : ${event.title}`,
+    `Événement : ${event.title}${event.room ? ` — Salle : ${event.room}` : ""}`,
     `Début : ${fmt(event.date)}   Fin : ${fmt(event.end_date)}`,
     `Capacité initiale : ${event.max_capacity - (event.extra_capacity ?? 0)}`,
     `Places supplémentaires demandées par le client (à facturer) : ${event.extra_capacity ?? 0}`,

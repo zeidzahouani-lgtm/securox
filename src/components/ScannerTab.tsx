@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Camera, CameraOff, ScanLine } from "lucide-react";
-import { listAttendees, listEvents, scanTicket, type ScanResult } from "@/lib/gate";
+import { listAttendees, listEvents, listSessions, scanTicketV2, MASTER_PREFIX, type ScanResult } from "@/lib/gate";
 import { useLiveGate } from "@/lib/realtime";
 
 type Feed = { code: string; ok: boolean; label: string; at: string };
@@ -17,6 +17,10 @@ export function ScannerTab() {
   const [pending, setPending] = useState<ScanResult | null>(null);
   const [feed, setFeed] = useState<Feed[]>([]);
   const [cameraOn, setCameraOn] = useState(false);
+  const [sessionId, setSessionId] = useState<string>("");
+  const [search, setSearch] = useState("");
+  const [notice, setNotice] = useState<string | null>(null);
+  const sessions = useQuery({ queryKey: ["sessions", eventId], queryFn: () => listSessions(eventId!), enabled: !!eventId });
   const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
   const lastScanRef = useRef<{ code: string; at: number } | null>(null);
 
@@ -40,7 +44,7 @@ export function ScannerTab() {
 
   const scan = useMutation({
     mutationFn: ({ ticket, force }: { ticket: string; force: boolean }) =>
-      scanTicket(ticket, eventId!, force),
+      scanTicketV2(ticket, eventId!, force, sessionId || null, "Scanner"),
     onSuccess: (res) => {
       if (res.result === "over_capacity") {
         setPending(res);
@@ -59,9 +63,13 @@ export function ScannerTab() {
                 ? "Entré"
                 : res.result === "granted_over"
                   ? "Entré (hors quota)"
-                  : res.result === "already"
-                    ? "Déjà utilisé"
-                    : "Code invalide",
+                  : res.result === "already" || res.result === "duplicate_session"
+                    ? "Doublon"
+                    : res.result === "wrong_event"
+                      ? "Mauvais événement"
+                      : res.result === "off_session"
+                        ? "Hors session"
+                        : "Code invalide",
             at: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           },
           ...f,
@@ -74,7 +82,16 @@ export function ScannerTab() {
 
   function submit(value: string) {
     const ticket = value.trim();
-    if (!ticket || !eventId) return;
+    if (!ticket) return;
+    if (ticket.startsWith(MASTER_PREFIX)) {
+      const id = ticket.slice(MASTER_PREFIX.length);
+      const ev = events.data?.find((e) => e.id === id);
+      setCode("");
+      setNotice(ev ? `Terminal configuré sur « ${ev.title} »${ev.room ? ` — ${ev.room}` : ""}` : "QR maître inconnu");
+      if (ev) { setEventId(ev.id); setSessionId(""); }
+      return;
+    }
+    if (!eventId) return;
     const now = Date.now();
     const prev = lastScanRef.current;
     // Ignore the same code scanned again within 4 seconds (camera reads continuously)
@@ -133,14 +150,21 @@ export function ScannerTab() {
           <select
             className="field-input mb-4"
             value={eventId ?? ""}
-            onChange={(e) => setEventId(e.target.value)}
+            onChange={(e) => { setEventId(e.target.value); setSessionId(""); }}
           >
             {events.data?.map((e) => (
               <option key={e.id} value={e.id}>
-                {e.title}
+                {e.title}{e.room ? ` — ${e.room}` : ""}
               </option>
             ))}
           </select>
+          {!!sessions.data?.length && (
+            <select className="field-input mb-4" value={sessionId} onChange={(e) => setSessionId(e.target.value)} aria-label="Session">
+              <option value="">Entrée générale (sans session)</option>
+              {sessions.data.map((x) => <option key={x.id} value={x.id}>{x.name} · {new Date(x.starts_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}–{new Date(x.ends_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</option>)}
+            </select>
+          )}
+          {notice && <p className="mb-4 rounded-md border border-mint/40 bg-mint/10 px-3 py-2 text-sm text-mint">{notice}</p>}
 
           <div className="relative grid aspect-square place-items-center overflow-hidden rounded-lg border border-border bg-muted/40">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/10 to-transparent" />
@@ -181,6 +205,21 @@ export function ScannerTab() {
             </Button>
           </div>
 
+          <div className="mt-4">
+            <input className="field-input" placeholder="Recherche de secours par nom / prénom…" value={search} onChange={(e) => setSearch(e.target.value)} />
+            {search.trim().length >= 2 && (
+              <div className="mt-2 max-h-48 space-y-1 overflow-auto">
+                {(live.data ?? []).filter((a) => (a.guest_name ?? "").toLowerCase().includes(search.trim().toLowerCase())).slice(0, 10).map((a) => (
+                  <div key={a.id} className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-sm">
+                    <span className="flex-1">{a.guest_name}</span>
+                    <span className="font-mono text-xs text-muted-foreground">{a.ticket_code}</span>
+                    <Button size="sm" onClick={() => { lastScanRef.current = null; submit(a.ticket_code); setSearch(""); }}>Valider</Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {last && (
             <div
               key={last.ticket_code + String(last.result) + String(last.current_count)}
@@ -196,9 +235,21 @@ export function ScannerTab() {
                   : last.result === "granted_over"
                     ? "ENTRÉ · HORS QUOTA"
                     : last.result === "already"
-                      ? "CODE DÉJÀ UTILISÉ"
-                      : "CODE INVALIDE"}
+                      ? "DOUBLON · CODE DÉJÀ UTILISÉ"
+                      : last.result === "duplicate_session"
+                        ? `DOUBLON · DÉJÀ SCANNÉ (${last.session ?? "session"})`
+                        : last.result === "wrong_event"
+                          ? "CE QR CODE APPARTIENT À UN AUTRE ÉVÉNEMENT"
+                          : last.result === "off_session"
+                            ? `HORS SESSION (${last.session ?? ""})`
+                            : "CODE INVALIDE"}
               </p>
+              {last.result === "wrong_event" && (
+                <p className="mt-1 text-sm font-semibold text-rose">
+                  Événement attendu : {last.expected_event ?? "—"}{last.expected_room ? ` — Salle : ${last.expected_room}` : ""}
+                </p>
+              )}
+              {granted && last.session && <p className="mt-1 text-sm text-mint">Session : {last.session}</p>}
               <p className="mt-1 font-mono text-xs text-muted-foreground">
                 {last.ticket_code ?? "—"} {last.guest_name ? `· ${last.guest_name}` : ""}
               </p>
