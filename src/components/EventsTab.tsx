@@ -157,7 +157,7 @@ export function EventsTab() {
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                {selected.client_id ? "Client associé" : "Aucun client n'a encore ouvert le lien"} · {tickets.length}/{selected.max_capacity} QR codes créés · {selected.current_count} entrées{selected.extra_capacity ? ` · +${selected.extra_capacity} places ajoutées par le client (à facturer)` : ""}
+                {tickets.length > 0 ? "Lien utilisé" : "Lien pas encore utilisé"} · {tickets.length}/{selected.max_capacity} QR codes créés · {selected.current_count} entrée{selected.current_count === 1 ? "" : "s"}{selected.extra_capacity ? ` · +${selected.extra_capacity} places ajoutées par le client (à facturer)` : ""}
               </p>
             </div>
             <EventExtras event={selected} />
