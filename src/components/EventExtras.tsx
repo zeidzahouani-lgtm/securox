@@ -1,15 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Check, Lock, Trash2, X } from "lucide-react";
+import { Check, Download, Lock, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   addSession, closeEventNow, decideRequest, deleteSession, listRequests, listSessions, updateEventRoom,
   MASTER_PREFIX, type EventRow,
 } from "@/lib/gate";
+import { downloadQrJpg } from "@/lib/qrimage";
 
 export function EventExtras({ event }: { event: EventRow }) {
   const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [mErr, setMErr] = useState<string | null>(null);
   const sessions = useQuery({ queryKey: ["sessions", event.id], queryFn: () => listSessions(event.id) });
   const [room, setRoom] = useState(event.room ?? "");
   const [name, setName] = useState("");
@@ -70,6 +73,24 @@ export function EventExtras({ event }: { event: EventRow }) {
         <div className="text-sm">
           <p className="font-semibold">QR code maître de l'événement</p>
           <p className="text-muted-foreground">À scanner par un agent pour configurer son terminal sur « {event.title} »{event.room ? ` — ${event.room}` : ""}. Il ne donne pas accès à l'entrée.</p>
+          <Button variant="ghost" disabled={busy}
+            onClick={async () => {
+              setMErr(null); setBusy(true);
+              try {
+                await downloadQrJpg({
+                  value: MASTER_PREFIX + event.id,
+                  title: event.title,
+                  subtitle: [event.room, "QR maître — ne donne pas accès à l'entrée"].filter(Boolean).join(" · "),
+                  fileName: `qr-maitre-${event.title}`,
+                });
+              } catch { setMErr("Téléchargement impossible, réessayez."); }
+              finally { setBusy(false); }
+            }}
+            className="mt-2 inline-flex items-center gap-1.5 px-0 text-sm text-accent hover:underline"
+          >
+            <Download className="size-3.5" /> Télécharger (JPG)
+          </Button>
+          {mErr && <p className="mt-1 text-sm text-rose">{mErr}</p>}
         </div>
       </div>
 
