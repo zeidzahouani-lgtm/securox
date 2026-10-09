@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Theme colors live in semantic global CSS tokens; all role screens share the Frame header and Button controls so both themes stay consistent.
+- Scanning access comes from the role alone — every agent holding the scanner code sees all live events — so the admin screens never re-add per-event scanner assignment (the old `event_scanners` checkboxes had no effect).
