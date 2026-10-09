@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dravox Access — Contrôle d'accès événementiel" },
+      { title: "Securox — Contrôle d'accès événementiel" },
       { name: "description", content: "Gestion d'événements, tickets QR et contrôle d'accès en direct." },
-      { property: "og:title", content: "Dravox Access — Contrôle d'accès événementiel" },
+      { property: "og:title", content: "Securox — Contrôle d'accès événementiel" },
       {
         property: "og:description",
         content: "Event management, QR tickets and live door check-in.",

@@ -8,7 +8,7 @@ import { ScannerTab } from "./ScannerTab";
 import { UsersTab } from "./UsersTab";
 import { ClientTab } from "./ClientTab";
 import { ThemeToggle } from "./ThemeToggle";
-import logoAsset from "@/assets/dravox-access-logo.png.asset.json";
+import logoAsset from "@/assets/securox-logo.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 
 const ROLE_LABEL: Record<Role, string> = { admin: "Admin", scanner: "Scanner", client: "Client" };
@@ -19,8 +19,8 @@ export function Frame({ children, right }: { children: ReactNode; right?: ReactN
         <header className="border-b-4 border-primary bg-header text-header-foreground no-print">
           <div className="mx-auto flex min-h-20 max-w-[1440px] items-center justify-between gap-3 px-4 md:px-8">
           <div className="flex items-center gap-4">
-          <img src={logoAsset.url} alt="Dravox Access" className="h-10 w-auto max-w-36 rounded-md bg-paper object-contain px-1.5 py-0.5" />
-          <span className="hidden border-l border-header-muted/30 pl-4 font-display text-sm font-semibold sm:block">DRAVOX ACCESS</span>
+          <img src={logoAsset.url} alt="Securox by dravox" className="h-16 w-auto max-w-24 rounded-md bg-paper object-contain px-1.5 py-0.5" />
+          <span className="hidden border-l border-header-muted/30 pl-4 font-display text-sm font-semibold sm:block">SECUROX</span>
           </div>
           <div className="flex items-center gap-3">
             {right}

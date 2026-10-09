@@ -46,7 +46,7 @@ export function RoleGate() {
     return (
       <div className="mx-auto max-w-5xl py-6 md:py-14">
         <div className="mb-10 border-l-4 border-primary pl-5">
-          <p className="mb-3 font-mono text-xs font-semibold text-primary">DRAVOX ACCESS</p>
+          <p className="mb-3 font-mono text-xs font-semibold text-primary">SECUROX</p>
           <h1 className="font-display text-4xl font-bold md:text-5xl">Vos espaces<span className="text-primary">.</span></h1>
         </div>
         <div className="grid gap-4 md:grid-cols-3">

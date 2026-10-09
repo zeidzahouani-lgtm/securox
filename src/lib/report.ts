@@ -24,7 +24,7 @@ export async function downloadEventReport(event: EventRow, live: AttendeeRow[]) 
 
   const doc = new jsPDF();
   doc.setFontSize(18);
-  doc.text("Dravox Access — Rapport de présence", 14, 18);
+  doc.text("Securox — Rapport de présence", 14, 18);
   doc.setFontSize(11);
   const fmt = (d: string | null) => (d ? new Date(d).toLocaleString("fr-FR") : "—");
   const lines = [

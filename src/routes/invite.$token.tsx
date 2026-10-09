@@ -10,9 +10,9 @@ import { inviteAdd, inviteDelete, inviteExtend, inviteGet } from "@/lib/gate";
 export const Route = createFileRoute("/invite/$token")({
   head: () => ({
     meta: [
-      { title: "Invitation — Dravox Access" },
+      { title: "Invitation — Securox" },
       { name: "description", content: "Créez les QR codes de vos invités pour votre événement." },
-      { property: "og:title", content: "Invitation — Dravox Access" },
+      { property: "og:title", content: "Invitation — Securox" },
       { property: "og:description", content: "Créez les QR codes de vos invités pour votre événement." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
