@@ -187,6 +187,8 @@ async function listByRole(role: "client" | "admin"): Promise<ClientUser[]> {
   return (data ?? []) as ClientUser[];
 }
 
+// DEPRECATED : les cases « Scanners assignés » ont été retirées de l'interface.
+// Tout agent entré avec le code PIN Scanner voit tous les événements en cours.
 export async function listAssignments(eventId: string): Promise<string[]> {
   const { data, error } = await supabase
     .from("event_scanners")

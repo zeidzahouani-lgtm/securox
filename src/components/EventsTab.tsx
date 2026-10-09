@@ -7,11 +7,8 @@ import {
   closeEndedEvents,
   createEvent,
   deleteEvent,
-  listAssignments,
   listAttendees,
   listEvents,
-  listScanners,
-  setAssignment,
   type EventRow,
 } from "@/lib/gate";
 import { useLiveGate } from "@/lib/realtime";
@@ -37,7 +34,6 @@ export function EventsTab() {
       return listEvents();
     },
   });
-  const scanners = useQuery({ queryKey: ["scanners"], queryFn: listScanners });
 
   useEffect(() => {
     if (!selectedId && events.data?.length) setSelectedId(events.data[0]!.id);
@@ -48,11 +44,6 @@ export function EventsTab() {
   const attendees = useQuery({
     queryKey: ["attendees", selectedId],
     queryFn: () => listAttendees(selectedId!),
-    enabled: !!selectedId,
-  });
-  const assigned = useQuery({
-    queryKey: ["assign", selectedId],
-    queryFn: () => listAssignments(selectedId!),
     enabled: !!selectedId,
   });
 
@@ -77,10 +68,6 @@ export function EventsTab() {
     },
   });
 
-  const toggle = useMutation({
-    mutationFn: ({ uid, on }: { uid: string; on: boolean }) => setAssignment(selectedId!, uid, on),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["assign", selectedId] }),
-  });
 
   const link = selected ? `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${selected.invite_token}` : "";
   const tickets = attendees.data ?? [];
@@ -172,21 +159,6 @@ export function EventsTab() {
               <p className="mt-2 text-xs text-muted-foreground">
                 {selected.client_id ? "Client associé" : "Aucun client n'a encore ouvert le lien"} · {tickets.length}/{selected.max_capacity} QR codes créés · {selected.current_count} entrées{selected.extra_capacity ? ` · +${selected.extra_capacity} places ajoutées par le client (à facturer)` : ""}
               </p>
-            </div>
-            <div>
-              <p className="field-label mb-2">Scanners assignés</p>
-              {!scanners.data?.length && <p className="text-sm text-muted-foreground">Créez d'abord un scanner dans l'onglet Utilisateurs.</p>}
-              <div className="space-y-2">
-                {scanners.data?.map((s) => {
-                  const on = assigned.data?.includes(s.id) ?? false;
-                  return (
-                    <label key={s.id} className="flex items-center gap-3 text-sm">
-                      <input type="checkbox" checked={on} onChange={() => toggle.mutate({ uid: s.id, on: !on })} />
-                      {s.full_name || (s.username ? `@${s.username}` : s.email)}
-                    </label>
-                  );
-                })}
-              </div>
             </div>
             <EventExtras event={selected} />
             </>)}
