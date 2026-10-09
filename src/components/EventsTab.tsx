@@ -15,11 +15,14 @@ import {
   type EventRow,
 } from "@/lib/gate";
 import { useLiveGate } from "@/lib/realtime";
+import { EventExtras, RequestsPanel } from "./EventExtras";
+import { downloadQrPdf } from "@/lib/qrpdf";
 
 export function EventsTab() {
   const qc = useQueryClient();
   useLiveGate();
   const [title, setTitle] = useState("");
+  const [room, setRoom] = useState("");
   const [date, setDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [capacity, setCapacity] = useState(100);
@@ -58,6 +61,7 @@ export function EventsTab() {
     onSuccess: (e: EventRow) => {
       setSelectedId(e.id);
       setTitle("");
+      setRoom("");
       setDate("");
       setEndDate("");
       qc.invalidateQueries({ queryKey: ["events"] });
@@ -91,6 +95,10 @@ export function EventsTab() {
               <label className="field-label">Nom</label>
               <input className="field-input mt-1" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
+            <div className="sm:col-span-2">
+              <label className="field-label">Salle</label>
+              <input className="field-input mt-1" placeholder="ex : Dar Zmen" value={room} onChange={(e) => setRoom(e.target.value)} />
+            </div>
             <div>
               <label className="field-label">Début</label>
               <input type="datetime-local" className="field-input mt-1" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -109,7 +117,7 @@ export function EventsTab() {
             disabled={create.isPending || !title || !date || !endDate || capacity < 1}
             onClick={() => {
               setError(null);
-              create.mutate({ title, date, endDate, capacity });
+              create.mutate({ title, room, date, endDate, capacity });
             }}
             className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40"
           >
@@ -135,6 +143,12 @@ export function EventsTab() {
             >
               <FileDown className="size-4" /> Rapport de présence (PDF)
             </Button>
+            {!selected.closed_at && tickets.length > 0 && (
+              <Button variant="outline" className="ml-2"
+                onClick={() => downloadQrPdf(selected.title, selected.room, tickets.map((t, i) => ({ code: t.ticket_code, name: t.guest_name || `Invité n°${i + 1}` })))}>
+                <FileDown className="size-4" /> Tous les QR codes (PDF)
+              </Button>
+            )}
             {selected.closed_at ? (
               <p className="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
                 Événement terminé le {new Date(selected.closed_at).toLocaleString()} : les QR codes et les accès ont été supprimés. Seul le rapport reste disponible.
@@ -174,12 +188,14 @@ export function EventsTab() {
                 })}
               </div>
             </div>
+            <EventExtras event={selected} />
             </>)}
           </div>
         )}
       </div>
 
-      <div className="lg:col-span-5">
+      <div className="space-y-6 lg:col-span-5">
+        <RequestsPanel events={events.data ?? []} />
         <div className="glass-panel rounded-lg p-6">
           <h3 className="mb-4 font-display text-lg font-semibold">Événements</h3>
           <div className="space-y-2">
@@ -197,7 +213,7 @@ export function EventsTab() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {new Date(e.date).toLocaleString()}
+                  {e.room ? `${e.room} · ` : ""}{new Date(e.date).toLocaleString()}
                   {e.closed_at && <span className="ml-2 rounded-full bg-muted px-2 py-0.5">Terminé</span>}
                 </p>
               </Button>
