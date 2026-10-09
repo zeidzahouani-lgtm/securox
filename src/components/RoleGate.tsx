@@ -1,27 +1,23 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowUpRight, Loader2, QrCode, ScanLine, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Loader2, ScanLine, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { pinLogin } from "@/lib/pin.functions";
 
-type Pick = "admin" | "scanner" | "client" | null;
+type Pick = "admin" | "scanner" | null;
 
 const CARDS = [
   { k: "admin", icon: ShieldCheck, title: "Admin", desc: "Créer les événements, suivre les entrées, rapports PDF." },
   { k: "scanner", icon: ScanLine, title: "Scanner", desc: "Contrôler l'accès à l'entrée avec compteur en direct." },
-  { k: "client", icon: QrCode, title: "Client", desc: "Générer les QR codes de vos invités via votre lien." },
 ] as const;
 
 export function RoleGate() {
   const [pick, setPick] = useState<Pick>(null);
   const [pin, setPin] = useState("");
-  const [link, setLink] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const login = useServerFn(pinLogin);
-  const navigate = useNavigate();
   const ActiveIcon = pick ? CARDS.find((c) => c.k === pick)!.icon : null;
 
   async function submitPin(e: React.FormEvent) {
@@ -37,12 +33,6 @@ export function RoleGate() {
     finally { setBusy(false); setPin(""); }
   }
 
-  function openLink(e: React.FormEvent) {
-    e.preventDefault();
-    const t = link.trim().split("/invite/").pop()?.split(/[?#/]/)[0];
-    if (t) navigate({ to: "/invite/$token", params: { token: t } });
-  }
-
   if (!pick) {
     return (
       <div className="mx-auto max-w-5xl py-6 md:py-14">
@@ -50,7 +40,7 @@ export function RoleGate() {
           <p className="mb-3 font-mono text-xs font-semibold text-primary">SECUROX</p>
           <h1 className="font-display text-4xl font-bold md:text-5xl">Vos espaces<span className="text-primary">.</span></h1>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {CARDS.map(({ k, icon: Icon, title }, i) => (
             <Button variant="outline" key={k} onClick={() => setPick(k)}
               className="group relative flex h-64 flex-col items-start justify-between whitespace-normal border-border bg-card p-6 text-left text-foreground hover:border-primary hover:bg-primary/5 hover:text-foreground">
@@ -71,15 +61,7 @@ export function RoleGate() {
       <Button variant="ghost" onClick={() => { setPick(null); setErr(null); }} className="mb-6 px-0 text-muted-foreground">
         <ArrowLeft className="size-4" /> Retour
       </Button>
-      {pick === "client" ? (
-        <form onSubmit={openLink} className="space-y-4">
-          {ActiveIcon && <ActiveIcon className="size-24 text-primary" strokeWidth={1.4} />}
-          <h2 className="font-display text-2xl font-bold">Espace client</h2>
-          <p className="text-sm text-muted-foreground">Collez le lien reçu de l'organisateur.</p>
-          <input required className="field-input" placeholder="https://…/invite/…" value={link} onChange={(e) => setLink(e.target.value)} />
-          <Button type="submit" className="h-12 w-full font-semibold">Ouvrir</Button>
-        </form>
-      ) : (
+      {pick && (
         <form onSubmit={submitPin} className="space-y-4">
           {ActiveIcon && <ActiveIcon className="size-24 text-primary" strokeWidth={1.4} />}
           <h2 className="font-display text-2xl font-bold">{pick === "admin" ? "Admin" : "Scanner"}</h2>
