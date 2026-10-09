@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Theme colors live in semantic global CSS tokens; all role screens share the Frame header and Button controls so both themes stay consistent.

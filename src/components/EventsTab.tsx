@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Copy, FileDown, Loader2, Trash2 } from "lucide-react";
@@ -83,10 +84,10 @@ export function EventsTab() {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <div className="space-y-6 lg:col-span-7">
-        <div className="glass-panel rounded-3xl p-6">
-          <h2 className="mb-5 font-display text-2xl font-bold tracking-tight">Nouvel événement</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
+        <div className="glass-panel rounded-lg p-6">
+          <h2 className="mb-5 font-display text-2xl font-bold ">Nouvel événement</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
               <label className="field-label">Nom</label>
               <input className="field-input mt-1" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
@@ -104,38 +105,38 @@ export function EventsTab() {
             </div>
           </div>
           {error && <p className="mt-3 text-sm text-rose">{error}</p>}
-          <button
+          <Button variant="ghost"
             disabled={create.isPending || !title || !date || !endDate || capacity < 1}
             onClick={() => {
               setError(null);
               create.mutate({ title, date, endDate, capacity });
             }}
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40"
+            className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40"
           >
             {create.isPending && <Loader2 className="size-4 animate-spin" />}
             Créer l'événement
-          </button>
+          </Button>
         </div>
 
         {selected && (
-          <div className="glass-panel space-y-5 rounded-3xl p-6">
+          <div className="glass-panel space-y-5 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-display text-lg font-semibold">{selected.title}</h3>
-              <button onClick={() => confirm("Supprimer cet événement ?") && remove.mutate(selected.id)} className="text-rose" aria-label="Supprimer">
+              <Button variant="ghost" onClick={() => confirm("Supprimer cet événement ?") && remove.mutate(selected.id)} className="text-rose" aria-label="Supprimer">
                 <Trash2 className="size-4" />
-              </button>
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground">
               {new Date(selected.date).toLocaleString()} → {selected.end_date ? new Date(selected.end_date).toLocaleString() : "—"}
             </p>
-            <button
+            <Button variant="ghost"
               onClick={() => downloadEventReport(selected, tickets)}
-              className="inline-flex items-center gap-2 rounded-xl border border-accent/40 px-4 py-2 text-sm font-semibold text-accent"
+              className="inline-flex items-center gap-2 rounded-md border border-accent/40 px-4 py-2 text-sm font-semibold text-accent"
             >
               <FileDown className="size-4" /> Rapport de présence (PDF)
-            </button>
+            </Button>
             {selected.closed_at ? (
-              <p className="rounded-xl border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+              <p className="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
                 Événement terminé le {new Date(selected.closed_at).toLocaleString()} : les QR codes et les accès ont été supprimés. Seul le rapport reste disponible.
               </p>
             ) : (<>
@@ -143,16 +144,16 @@ export function EventsTab() {
               <p className="field-label">Lien à envoyer au client</p>
               <div className="mt-1 flex gap-2">
                 <input readOnly className="field-input font-mono text-xs" value={link} />
-                <button
+                <Button variant="ghost"
                   onClick={() => {
                     navigator.clipboard.writeText(link);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1500);
                   }}
-                  className="inline-flex items-center gap-1 rounded-xl border border-border px-3 text-sm text-accent"
+                  className="inline-flex items-center gap-1 rounded-md border border-border px-3 text-sm text-accent"
                 >
                   <Copy className="size-4" /> {copied ? "Copié" : "Copier"}
-                </button>
+                </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
                 {selected.client_id ? "Client associé" : "Aucun client n'a encore ouvert le lien"} · {tickets.length}/{selected.max_capacity} QR codes créés · {selected.current_count} entrées{selected.extra_capacity ? ` · +${selected.extra_capacity} places ajoutées par le client (à facturer)` : ""}
@@ -179,14 +180,14 @@ export function EventsTab() {
       </div>
 
       <div className="lg:col-span-5">
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel rounded-lg p-6">
           <h3 className="mb-4 font-display text-lg font-semibold">Événements</h3>
           <div className="space-y-2">
             {events.data?.map((e) => (
-              <button
+              <Button variant="ghost"
                 key={e.id}
                 onClick={() => setSelectedId(e.id)}
-                className={`w-full rounded-2xl border p-4 text-left ${e.id === selectedId ? "border-accent/50 bg-accent/10" : "border-border bg-muted/50 hover:bg-muted"}`}
+                className={`w-full rounded-lg border p-4 text-left ${e.id === selectedId ? "border-accent/50 bg-accent/10" : "border-border bg-muted/50 hover:bg-muted"}`}
               >
                 <div className="flex items-baseline justify-between">
                   <span className="font-semibold">{e.title}</span>
@@ -199,7 +200,7 @@ export function EventsTab() {
                   {new Date(e.date).toLocaleString()}
                   {e.closed_at && <span className="ml-2 rounded-full bg-muted px-2 py-0.5">Terminé</span>}
                 </p>
-              </button>
+              </Button>
             ))}
             {!events.data?.length && !events.isLoading && <p className="text-sm text-muted-foreground">Aucun événement.</p>}
           </div>

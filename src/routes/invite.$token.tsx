@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -51,27 +52,27 @@ function InvitePage() {
 
   if (q.isLoading) return <Frame><Loader2 className="mx-auto size-6 animate-spin text-accent" /></Frame>;
   if (q.error || !q.data)
-    return <Frame><div className="glass-panel rounded-3xl p-6 text-sm text-rose">{(q.error as Error)?.message ?? "Lien invalide"}</div></Frame>;
+    return <Frame><div className="glass-panel rounded-lg p-6 text-sm text-rose">{(q.error as Error)?.message ?? "Lien invalide"}</div></Frame>;
 
   const ev = q.data;
   const list = ev.attendees;
   const left = ev.max_capacity - list.length;
   const tab = (k: "named" | "batch", label: string) => (
-    <button type="button" onClick={() => setMode(k)}
-      className={`rounded-full px-4 py-1.5 text-sm ${mode === k ? "bg-gradient-to-r from-accent to-accent2 font-semibold text-accent-foreground" : "text-muted-foreground"}`}>
+    <Button variant="ghost" type="button" onClick={() => setMode(k)}
+      className={`rounded-md px-4 py-1.5 text-sm ${mode === k ? "bg-primary font-semibold text-accent-foreground" : "text-muted-foreground"}`}>
       {label}
-    </button>
+    </Button>
   );
 
   return (
     <Frame>
       <div className="space-y-6">
-        <div className="glass-panel rounded-3xl p-6 no-print">
+        <div className="glass-panel rounded-lg p-6 no-print">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h1 className="font-display text-xl font-bold">{ev.title}</h1>
             <span className="font-display text-sm">{list.length}<span className="text-muted-foreground">/{ev.max_capacity}</span> QR codes</span>
           </div>
-          <div className="mb-4 flex w-fit gap-1 rounded-full border border-border p-1">
+          <div className="mb-4 flex w-fit gap-1 rounded-md border border-border p-1">
             {tab("batch", "Plusieurs codes")}
             {tab("named", "Avec nom")}
           </div>
@@ -86,40 +87,40 @@ function InvitePage() {
               <input type="number" min={1} max={Math.max(1, left)} className="field-input sm:col-span-2" value={count}
                 onChange={(e) => setCount(Math.max(1, Number(e.target.value) || 1))} />
             )}
-            <button disabled={add.isPending || left <= 0 || (mode === "named" && (!first.trim() || !last.trim()))}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent2 px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
+            <Button variant="ghost" disabled={add.isPending || left <= 0 || (mode === "named" && (!first.trim() || !last.trim()))}
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
               {add.isPending && <Loader2 className="size-4 animate-spin" />}
               Générer
-            </button>
+            </Button>
           </form>
           <p className="mt-3 text-sm text-muted-foreground">{left > 0 ? `Il reste ${left} QR code(s).` : "Tous les QR codes ont été créés."}</p>
           {ev.extra_capacity > 0 && (
             <p className="mt-2 text-sm text-amber">{ev.extra_capacity} place(s) supplémentaire(s) ajoutée(s) — elles seront facturées.</p>
           )}
           {!askMore ? (
-            <button type="button" onClick={() => setAskMore(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold text-accent hover:bg-muted">
+            <Button variant="ghost" type="button" onClick={() => setAskMore(true)} className="mt-4 inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-accent hover:bg-muted">
               <Plus className="size-4" /> Ajouter des personnes
-            </button>
+            </Button>
           ) : (
-            <div className="mt-4 rounded-2xl border border-amber/40 bg-amber/10 p-4">
+            <div className="mt-4 rounded-lg border border-amber/40 bg-amber/10 p-4">
               <p className="flex items-start gap-2 text-sm"><AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber" />
                 Les places ajoutées au-delà du nombre prévu seront <b>facturées en supplément</b>. Elles sont disponibles tout de suite.</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <input type="number" min={1} max={1000} className="field-input w-28" value={more} onChange={(e) => setMore(Math.max(1, Number(e.target.value) || 1))} />
-                <button type="button" disabled={extend.isPending} onClick={() => { setErr(null); extend.mutate(); }}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber to-rose px-4 py-2 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
+                <Button variant="ghost" type="button" disabled={extend.isPending} onClick={() => { setErr(null); extend.mutate(); }}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-sm font-semibold text-accent-foreground disabled:opacity-40">
                   {extend.isPending && <Loader2 className="size-4 animate-spin" />} J'accepte, ajouter {more} place(s)
-                </button>
-                <button type="button" onClick={() => setAskMore(false)} className="px-3 text-sm text-muted-foreground">Annuler</button>
+                </Button>
+                <Button variant="ghost" type="button" onClick={() => setAskMore(false)} className="px-3 text-sm text-muted-foreground">Annuler</Button>
               </div>
             </div>
           )}
           {err && <p className="mt-2 text-sm text-rose">{err}</p>}
         </div>
 
-        <div className="glass-panel rounded-3xl p-6 print-area">
+        <div className="glass-panel rounded-lg p-6 print-area">
           <div className="mb-4 flex justify-end">
-            <button onClick={() => window.print()} className="text-accent no-print" aria-label="Imprimer"><Printer className="size-4" /></button>
+            <Button variant="ghost" onClick={() => window.print()} className="text-accent no-print" aria-label="Imprimer"><Printer className="size-4" /></Button>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
             {list.map((t, i) => (

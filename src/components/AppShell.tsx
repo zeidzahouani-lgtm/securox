@@ -9,27 +9,28 @@ import { UsersTab } from "./UsersTab";
 import { ClientTab } from "./ClientTab";
 import { ThemeToggle } from "./ThemeToggle";
 import logoAsset from "@/assets/dravox-access-logo.png.asset.json";
+import { Button } from "@/components/ui/button";
 
 const ROLE_LABEL: Record<Role, string> = { admin: "Admin", scanner: "Scanner", client: "Client" };
 
 export function Frame({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background font-body text-foreground">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 -top-40 size-[560px] rounded-full bg-glow blur-[120px]" />
-        <div className="absolute -right-40 top-1/3 size-[560px] rounded-full bg-glow2 blur-[130px]" />
-        <div className="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(var(--line)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
-      </div>
-      <div className="relative z-10 mx-auto max-w-[1440px] px-4 py-5 md:px-6">
-        <header className="mb-8 flex items-center justify-between gap-3 no-print">
-          <img src={logoAsset.url} alt="Dravox Access" className="h-10 w-auto rounded-lg bg-white object-contain px-1.5 py-0.5 shadow-sm" />
+        <header className="border-b-4 border-primary bg-header text-header-foreground no-print">
+          <div className="mx-auto flex min-h-20 max-w-[1440px] items-center justify-between gap-3 px-4 md:px-8">
+          <div className="flex items-center gap-4">
+          <img src={logoAsset.url} alt="Dravox Access" className="h-10 w-auto max-w-36 rounded-md bg-paper object-contain px-1.5 py-0.5" />
+          <span className="hidden border-l border-header-muted/30 pl-4 font-display text-sm font-semibold sm:block">DRAVOX ACCESS</span>
+          </div>
           <div className="flex items-center gap-3">
             {right}
             <ThemeToggle />
           </div>
+          </div>
         </header>
+      <main className="relative mx-auto max-w-[1440px] px-4 py-8 md:px-8">
         {children}
-      </div>
+      </main>
     </div>
   );
 }
@@ -51,13 +52,13 @@ export function AppShell({ children }: { authSubtitle?: string; children?: (role
             <span className="size-1.5 animate-softpulse rounded-full bg-mint" />
             {ROLE_LABEL[role]}
           </span>
-          <button
+          <Button variant="ghost" size="icon" title="Quitter"
             onClick={async () => { await qc.cancelQueries(); qc.clear(); await signOut(); }}
-            className="grid size-9 place-items-center rounded-full border border-border bg-muted/50 text-muted-foreground hover:text-foreground"
+            className="border border-header-muted/30 text-header-foreground hover:bg-primary"
             aria-label="Quitter"
           >
             <LogOut className="size-4" />
-          </button>
+          </Button>
         </div>
       }
     >
@@ -77,12 +78,12 @@ function RoleHome({ role }: { role: Role }) {
   ] as const;
   return (
     <>
-      <div className="mb-8 flex w-fit items-center gap-1 rounded-full border border-border bg-muted/50 p-1 no-print">
+      <div className="mb-8 flex flex-wrap items-center gap-2 border-b border-border pb-4 no-print">
         {tabs.map(([k, label, Icon]) => (
-          <button key={k} onClick={() => setTab(k)}
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${tab === k ? "bg-gradient-to-r from-accent to-accent2 font-display font-semibold text-accent-foreground shadow" : "text-muted-foreground hover:text-foreground"}`}>
+          <Button variant={tab === k ? "default" : "ghost"} key={k} onClick={() => setTab(k)}
+            className="h-11 px-4 font-semibold" aria-pressed={tab === k}>
             <Icon className="size-4" /> {label}
-          </button>
+          </Button>
         ))}
       </div>
       {tab === "events" ? <EventsTab /> : tab === "users" ? <UsersTab /> : <ScannerTab />}

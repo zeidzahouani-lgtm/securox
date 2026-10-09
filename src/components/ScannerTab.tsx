@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Camera, CameraOff, ScanLine } from "lucide-react";
@@ -120,7 +121,7 @@ export function ScannerTab() {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <div className="lg:col-span-6">
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel rounded-lg p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h3 className="font-display text-lg font-semibold">Scanner d'entrée</h3>
             <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.15em] text-mint">
@@ -141,7 +142,7 @@ export function ScannerTab() {
             ))}
           </select>
 
-          <div className="relative grid aspect-square place-items-center overflow-hidden rounded-2xl border border-border bg-muted/40">
+          <div className="relative grid aspect-square place-items-center overflow-hidden rounded-lg border border-border bg-muted/40">
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/10 to-transparent" />
             {!cameraOn && (
               <div className="pointer-events-none absolute inset-x-0 h-16 animate-scanline bg-gradient-to-b from-transparent via-accent/40 to-transparent" />
@@ -157,7 +158,7 @@ export function ScannerTab() {
             </span>
           </div>
 
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
             <input
               className="field-input font-mono"
               placeholder="Scanner ou saisir un code…"
@@ -165,25 +166,25 @@ export function ScannerTab() {
               onChange={(e) => setCode(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit(code)}
             />
-            <button
+            <Button variant="ghost"
               onClick={() => submit(code)}
-              className="whitespace-nowrap rounded-xl bg-gradient-to-r from-accent to-accent2 px-5 py-3 font-display text-sm font-semibold text-accent-foreground"
+              className="whitespace-nowrap rounded-md bg-primary px-5 py-3 font-display text-sm font-semibold text-accent-foreground"
             >
               Valider
-            </button>
-            <button
+            </Button>
+            <Button variant="ghost"
               onClick={() => setCameraOn((v) => !v)}
-              className="rounded-xl border border-border p-3 text-muted-foreground"
+              className="rounded-md border border-border p-3 text-muted-foreground"
               aria-label="Toggle camera"
             >
               {cameraOn ? <CameraOff className="size-4" /> : <Camera className="size-4" />}
-            </button>
+            </Button>
           </div>
 
           {last && (
             <div
               key={last.ticket_code + String(last.result) + String(last.current_count)}
-              className={`mt-4 animate-slam rounded-2xl border px-4 py-3 ${
+              className={`mt-4 animate-slam rounded-lg border px-4 py-3 ${
                 granted ? "border-mint/40 bg-mint/10" : "border-rose/40 bg-rose/10"
               }`}
             >
@@ -207,7 +208,7 @@ export function ScannerTab() {
       </div>
 
       <div className="lg:col-span-6 space-y-6">
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel rounded-lg p-6">
           <div className="mb-2 flex items-end justify-between">
             <span className="field-label">Remplissage</span>
             <span className="font-display text-3xl font-bold">
@@ -217,48 +218,48 @@ export function ScannerTab() {
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-accent to-accent2 transition-[width] duration-300"
+              className="h-full rounded-full bg-primary transition-[width] duration-300"
               style={{ width: `${pct}%` }}
             />
           </div>
           <div className="mt-4 grid grid-cols-3 gap-3">
-            <div className="rounded-xl border border-border bg-muted/50 p-4">
+            <div className="rounded-md border border-border bg-muted/50 p-4">
               <p className="field-label">Présents</p>
               <p className="font-display text-3xl font-bold text-mint">{inside}</p>
             </div>
-            <div className="rounded-xl border border-border bg-muted/50 p-4">
+            <div className="rounded-md border border-border bg-muted/50 p-4">
               <p className="field-label">Capacité</p>
               <p className="font-display text-3xl font-bold">{capacity}</p>
             </div>
-            <div className="rounded-xl border border-border bg-muted/50 p-4">
+            <div className="rounded-md border border-border bg-muted/50 p-4">
               <p className="field-label">Restant</p>
               <p className="font-display text-3xl font-bold text-amber">{remaining}</p>
             </div>
           </div>
         </div>
 
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel rounded-lg p-6">
           <div className="mb-4 flex items-center justify-between">
             <p className="field-label">Entrées · 60 dernières minutes</p>
             <span className="font-display text-sm"><span className="text-mint">{lastHour}</span> entrées · <span className="text-amber">{overLimit}</span> hors quota</span>
           </div>
           <div className="flex h-28 items-end gap-1.5">
             {buckets.map((b, i) => (
-              <div key={i} className="flex-1 rounded-t-md bg-gradient-to-t from-accent to-accent2 transition-[height] duration-500"
+              <div key={i} className="flex-1 rounded-t-md bg-primary transition-[height] duration-500"
                 style={{ height: `${Math.max(4, (b / maxB) * 100)}%`, opacity: b ? 1 : 0.25 }} title={`${b} entrée(s)`} />
             ))}
           </div>
           <div className="mt-1 flex justify-between text-[10px] text-muted-foreground"><span>-60 min</span><span>maintenant</span></div>
         </div>
 
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel rounded-lg p-6">
           <div className="mb-3 flex items-center justify-between">
             <p className="field-label">Flux en direct · tous les scanners</p>
             <span className="flex items-center gap-1.5 text-[11px] text-mint"><span className="size-2 animate-softpulse rounded-full bg-mint" />Temps réel</span>
           </div>
           <div className="max-h-64 space-y-1.5 overflow-auto">
             {entered.slice(0, 30).map((a) => (
-              <div key={a.id} className="flex animate-slam items-center gap-3 rounded-xl border border-border bg-muted/40 px-3 py-2">
+              <div key={a.id} className="flex animate-slam items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2">
                 <span className={`size-2 rounded-full ${a.status === "Over-limit" ? "bg-amber" : "bg-mint"}`} />
                 <span className="text-sm font-medium">{a.guest_name || "Invité"}</span>
                 <span className="font-mono text-xs text-muted-foreground">{a.ticket_code}</span>
@@ -269,7 +270,7 @@ export function ScannerTab() {
           </div>
         </div>
 
-        <div className="glass-panel rounded-3xl p-6">
+        <div className="glass-panel rounded-lg p-6">
           <p className="field-label mb-3">Mes scans</p>
           <div className="space-y-2">
             {feed.map((f, i) => (
@@ -288,7 +289,7 @@ export function ScannerTab() {
       {pending && (
         <div className="fixed inset-0 z-50 grid place-items-center p-6">
           <div className="absolute inset-0 bg-background/80" />
-          <div className="relative w-full max-w-md animate-slam rounded-3xl border border-rose/40 bg-gradient-to-br from-rose/15 to-amber/10 p-6 backdrop-blur-xl">
+          <div className="relative w-full max-w-md animate-slam rounded-lg border border-rose/40 bg-gradient-to-br from-rose/15 to-amber/10 p-6 backdrop-blur-xl">
             <div className="mb-3 flex items-center gap-2">
               <span className="size-2 animate-softpulse rounded-full bg-rose" />
               <p className="font-display font-semibold text-rose">
@@ -300,13 +301,13 @@ export function ScannerTab() {
               {pending.guest_name ? ` · ${pending.guest_name}` : ""} a été scanné au-delà de la capacité prévue. Que faire ?
             </p>
             <div className="grid grid-cols-2 gap-3">
-              <button
+              <Button variant="ghost"
                 onClick={() => scan.mutate({ ticket: pending.ticket_code!, force: true })}
-                className="rounded-xl bg-gradient-to-r from-amber to-rose py-3 font-display text-sm font-semibold text-accent-foreground"
+                className="rounded-md bg-primary py-3 font-display text-sm font-semibold text-accent-foreground"
               >
                 Accepter et facturer
-              </button>
-              <button
+              </Button>
+              <Button variant="ghost"
                 onClick={() => {
                   setFeed((f) =>
                     [
@@ -324,10 +325,10 @@ export function ScannerTab() {
                   );
                   setPending(null);
                 }}
-                className="rounded-xl border border-rose/40 py-3 font-display text-sm font-semibold text-rose"
+                className="rounded-md border border-rose/40 py-3 font-display text-sm font-semibold text-rose"
               >
                 Ne pas laisser
-              </button>
+              </Button>
             </div>
           </div>
         </div>
