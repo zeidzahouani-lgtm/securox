@@ -22,6 +22,7 @@ export function RoleGate() {
   const [err, setErr] = useState<string | null>(null);
   const login = useServerFn(pinLogin);
   const navigate = useNavigate();
+  const ActiveIcon = pick ? CARDS.find((c) => c.k === pick)!.icon : null;
 
   async function submitPin(e: React.FormEvent) {
     e.preventDefault();
@@ -74,6 +75,7 @@ export function RoleGate() {
       </Button>
       {pick === "client" ? (
         <form onSubmit={openLink} className="space-y-4">
+          {ActiveIcon && <span className="grid size-20 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary"><ActiveIcon className="size-12" strokeWidth={1.5} /></span>}
           <h2 className="font-display text-2xl font-bold">Espace client</h2>
           <p className="text-sm text-muted-foreground">Collez le lien reçu de l'organisateur.</p>
           <input required className="field-input" placeholder="https://…/invite/…" value={link} onChange={(e) => setLink(e.target.value)} />
@@ -81,6 +83,7 @@ export function RoleGate() {
         </form>
       ) : (
         <form onSubmit={submitPin} className="space-y-4">
+          {ActiveIcon && <span className="grid size-20 place-items-center rounded-lg border-2 border-primary/30 bg-primary/10 text-primary"><ActiveIcon className="size-12" strokeWidth={1.5} /></span>}
           <h2 className="font-display text-2xl font-bold">{pick === "admin" ? "Admin" : "Scanner"}</h2>
           <p className="text-sm text-muted-foreground">Entrez le code PIN.</p>
           <input autoFocus inputMode="numeric" type="password" maxLength={8} required
