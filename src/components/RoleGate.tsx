@@ -33,12 +33,6 @@ export function RoleGate() {
     finally { setBusy(false); setPin(""); }
   }
 
-  function openLink(e: React.FormEvent) {
-    e.preventDefault();
-    const t = link.trim().split("/invite/").pop()?.split(/[?#/]/)[0];
-    if (t) navigate({ to: "/invite/$token", params: { token: t } });
-  }
-
   if (!pick) {
     return (
       <div className="mx-auto max-w-5xl py-6 md:py-14">
