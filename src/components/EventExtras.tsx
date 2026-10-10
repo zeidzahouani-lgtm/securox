@@ -33,20 +33,41 @@ export function EventExtras({ event }: { event: EventRow }) {
     mutationFn: () => removeMenu(event.id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
   });
+  const setMenu = useMutation({
+    mutationFn: (path: string) => setEventMenu(event.id, path),
+    onSuccess: () => { setMenuErr(null); qc.invalidateQueries({ queryKey: ["events"] }); },
+    onError: (e: Error) => setMenuErr(e.message),
+  });
+  const media = useQuery({ queryKey: ["media"], queryFn: listMedia });
+  const menuFiles = (media.data ?? []).filter((m) => {
+    const k = kind(m.mime, m.path);
+    return k === "image" || k === "pdf";
+  });
 
   return (
     <div className="space-y-5 border-t border-border pt-5">
       <div>
         <p className="mb-2 flex items-center gap-2 text-sm font-semibold"><UtensilsCrossed className="size-4 text-primary" /> Menu / carte du restaurant</p>
         <p className="mb-2 text-sm text-muted-foreground">
-          {event.menu_path ? "Menu en ligne : l'invité le voit en scannant son QR code avec son téléphone." : "Aucun menu. Ajoutez une image ou un PDF (10 Mo max)."}
+          {event.menu_path ? "Menu en ligne : l'invité le voit en scannant son QR code avec son téléphone." : "Aucun menu. Choisissez un fichier de la médiathèque ou envoyez une image / un PDF (10 Mo max)."}
         </p>
         <div className="flex flex-wrap items-center gap-2">
-          <input type="file" accept="image/*,application/pdf" className="text-sm" disabled={upMenu.isPending}
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) upMenu.mutate(f); e.target.value = ""; }} />
+          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm font-medium transition-colors hover:bg-muted/70">
+            <Upload className="size-3.5" /> Uploader un fichier
+            <input type="file" accept="image/*,application/pdf" className="hidden" disabled={upMenu.isPending}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) upMenu.mutate(f); e.target.value = ""; }} />
+          </label>
+          {menuFiles.length > 0 && (
+            <select className="field-input max-w-64" value="" disabled={setMenu.isPending}
+              onChange={(e) => { const p = e.target.value; if (p) setMenu.mutate(p); }}>
+              <option value="">Choisir dans la médiathèque…</option>
+              {menuFiles.map((m) => <option key={m.id} value={m.path}>{m.name}</option>)}
+            </select>
+          )}
           {event.menu_path && <Button variant="ghost" size="sm" className="text-rose" onClick={() => rmMenu.mutate()}>Retirer le menu</Button>}
         </div>
         {upMenu.isPending && <p className="mt-1 text-sm text-muted-foreground">Envoi…</p>}
+        {setMenu.isPending && <p className="mt-1 text-sm text-muted-foreground">Application du menu…</p>}
         {menuErr && <p className="mt-1 text-sm text-rose">{menuErr}</p>}
       </div>
       <div>
