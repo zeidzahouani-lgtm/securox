@@ -14,6 +14,7 @@ export type EventRow = {
   report: EventReport | null;
   extra_capacity?: number;
   room?: string | null;
+  menu_path?: string | null;
 };
 
 export type EventReport = {
@@ -306,4 +307,39 @@ export async function scanTicketV2(ticketCode: string, eventId: string, force: b
   });
   if (error) throw error;
   return data as ScanResult;
+}
+
+// QR invité : contient une adresse /m/<code> pour que l'invité voie le menu avec son téléphone ;
+// les agents scannent le même QR, le code est extrait de l'adresse.
+export function ticketQrValue(code: string) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/m/${code}`;
+}
+export function extractTicket(value: string) {
+  const v = value.trim();
+  const m = v.match(/\/m\/([A-Za-z0-9-]+)\/?(?:[?#].*)?$/);
+  return m ? m[1]! : v;
+}
+export async function uploadMenu(eventId: string, file: File) {
+  const ext = (file.name.split(".").pop() || "bin").toLowerCase();
+  const path = `${eventId}/menu-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from("menus").upload(path, file, { contentType: file.type, upsert: true });
+  if (error) throw error;
+  const { error: e2 } = await supabase.from("events").update({ menu_path: path } as never).eq("id", eventId);
+  if (e2) throw e2;
+}
+export async function removeMenu(eventId: string) {
+  const { error } = await supabase.from("events").update({ menu_path: null } as never).eq("id", eventId);
+  if (error) throw error;
+}
+export async function menuUrl(path: string) {
+  const { data, error } = await supabase.storage.from("menus").createSignedUrl(path, 3600);
+  if (error) throw error;
+  return data.signedUrl;
+}
+export type GuestMenu = { title: string; room: string | null; menu_path: string | null; date: string; guest_name: string | null };
+export async function guestMenu(code: string): Promise<GuestMenu | null> {
+  const { data, error } = await (supabase.rpc as any)("guest_menu", { _code: code });
+  if (error) throw error;
+  return data as GuestMenu | null;
 }

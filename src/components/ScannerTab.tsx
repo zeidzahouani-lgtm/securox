@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Camera, CameraOff, ScanLine } from "lucide-react";
-import { listAttendees, listEvents, listSessions, scanTicketV2, MASTER_PREFIX, type ScanResult } from "@/lib/gate";
+import { listAttendees, listEvents, listSessions, scanTicketV2, MASTER_PREFIX, extractTicket, type ScanResult } from "@/lib/gate";
 import { useLiveGate } from "@/lib/realtime";
 
 type Feed = { code: string; ok: boolean; label: string; at: string };
@@ -81,7 +81,7 @@ export function ScannerTab() {
   });
 
   function submit(value: string) {
-    const ticket = value.trim();
+    const ticket = extractTicket(value);
     if (!ticket) return;
     if (ticket.startsWith(MASTER_PREFIX)) {
       const id = ticket.slice(MASTER_PREFIX.length);

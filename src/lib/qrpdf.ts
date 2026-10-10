@@ -1,3 +1,4 @@
+import { ticketQrValue } from "@/lib/gate";
 export type BadgeItem = { code: string; name: string };
 
 /** One PDF with every QR code as cut-ready badges (3 x 4 per A4 page). */
@@ -16,7 +17,7 @@ export async function downloadQrPdf(title: string, room: string | null | undefin
     doc.setFillColor(200, 30, 30); doc.rect(x, y, w, 7, "F");
     doc.setTextColor(255); doc.setFontSize(8);
     doc.text(title.slice(0, 40), x + w / 2, y + 4.8, { align: "center" });
-    const url = await QR.toDataURL(items[i]!.code, { margin: 1, width: 400 });
+    const url = await QR.toDataURL(ticketQrValue(items[i]!.code), { margin: 1, width: 400 });
     const q = Math.min(w - 16, h - 30);
     doc.addImage(url, "PNG", x + (w - q) / 2, y + 10, q, q);
     doc.setTextColor(20); doc.setFontSize(11);

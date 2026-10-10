@@ -190,6 +190,7 @@ export type Database = {
           id: string
           invite_token: string
           max_capacity: number
+          menu_path: string | null
           report: Json | null
           room: string | null
           title: string
@@ -205,6 +206,7 @@ export type Database = {
           id?: string
           invite_token?: string
           max_capacity: number
+          menu_path?: string | null
           report?: Json | null
           room?: string | null
           title: string
@@ -220,6 +222,7 @@ export type Database = {
           id?: string
           invite_token?: string
           max_capacity?: number
+          menu_path?: string | null
           report?: Json | null
           room?: string | null
           title?: string
@@ -339,6 +342,7 @@ export type Database = {
         Returns: undefined
       }
       ensure_my_role: { Args: never; Returns: string }
+      guest_menu: { Args: { _code: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

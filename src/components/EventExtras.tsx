@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Check, Download, Lock, Trash2, X } from "lucide-react";
+import { Check, Download, Lock, Trash2, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  addSession, closeEventNow, decideRequest, deleteSession, listRequests, listSessions, updateEventRoom,
+  addSession, closeEventNow, decideRequest, deleteSession, listRequests, listSessions, updateEventRoom, uploadMenu, removeMenu,
   MASTER_PREFIX, type EventRow,
 } from "@/lib/gate";
 import { downloadQrJpg } from "@/lib/qrimage";
@@ -35,8 +35,32 @@ export function EventExtras({ event }: { event: EventRow }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
   });
 
+  const [menuErr, setMenuErr] = useState<string | null>(null);
+  const upMenu = useMutation({
+    mutationFn: (f: File) => uploadMenu(event.id, f),
+    onSuccess: () => { setMenuErr(null); qc.invalidateQueries({ queryKey: ["events"] }); },
+    onError: (e: Error) => setMenuErr(e.message),
+  });
+  const rmMenu = useMutation({
+    mutationFn: () => removeMenu(event.id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
+  });
+
   return (
     <div className="space-y-5 border-t border-border pt-5">
+      <div>
+        <p className="mb-2 flex items-center gap-2 text-sm font-semibold"><UtensilsCrossed className="size-4 text-primary" /> Menu / carte du restaurant</p>
+        <p className="mb-2 text-sm text-muted-foreground">
+          {event.menu_path ? "Menu en ligne : l'invité le voit en scannant son QR code avec son téléphone." : "Aucun menu. Ajoutez une image ou un PDF (10 Mo max)."}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <input type="file" accept="image/*,application/pdf" className="text-sm" disabled={upMenu.isPending}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) upMenu.mutate(f); e.target.value = ""; }} />
+          {event.menu_path && <Button variant="ghost" size="sm" className="text-rose" onClick={() => rmMenu.mutate()}>Retirer le menu</Button>}
+        </div>
+        {upMenu.isPending && <p className="mt-1 text-sm text-muted-foreground">Envoi…</p>}
+        {menuErr && <p className="mt-1 text-sm text-rose">{menuErr}</p>}
+      </div>
       <div>
         <p className="field-label mb-1">Salle</p>
         <div className="flex gap-2">

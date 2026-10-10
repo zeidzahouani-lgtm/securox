@@ -8,6 +8,13 @@
       "when": 1791554913561,
       "tag": "0000_securox_v2_rooms_sessions_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791639782657,
+      "tag": "0001_event_menus",
+      "breakpoints": true
     }
   ]
 }

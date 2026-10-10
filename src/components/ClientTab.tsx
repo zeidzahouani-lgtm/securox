@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QRCodeCanvas } from "qrcode.react";
 import { useEffect, useRef, useState } from "react";
 import { Download, Loader2, Printer, Trash2 } from "lucide-react";
-import { addAttendee, deleteAttendee, listAttendees, listEvents } from "@/lib/gate";
+import { addAttendee, deleteAttendee, listAttendees, listEvents, ticketQrValue } from "@/lib/gate";
 
 function downloadTicketJpg(canvas: HTMLCanvasElement, guestName: string, code: string) {
   const pad = 16;
@@ -43,7 +43,7 @@ export function TicketQr({
   return (
     <div className="rounded-lg border border-border bg-muted/40 p-3">
       <div className="mb-2 grid place-items-center rounded-lg bg-paper p-2">
-        <QRCodeCanvas ref={ref} value={code} size={140} marginSize={2} />
+        <QRCodeCanvas ref={ref} value={ticketQrValue(code)} size={140} marginSize={2} />
       </div>
       <p className="break-words font-semibold">{guestName}</p>
       <p className="break-all font-mono text-[11px] text-muted-foreground">{code}</p>
