@@ -111,7 +111,19 @@ export async function createEvent(input: {
   return data as EventRow;
 }
 
+// Adresse publique utilisée dans les QR codes : l'aperçu de l'éditeur n'est pas accessible depuis un téléphone.
+export const PUBLIC_ORIGIN = "https://access.dravox.cloud";
+export function publicOrigin() {
+  if (typeof window === "undefined") return PUBLIC_ORIGIN;
+  const o = window.location.origin;
+  return /localhost|lovableproject\.com|id-preview--|\.lovable\.app$/.test(o) ? PUBLIC_ORIGIN : o;
+}
+
 export async function deleteEvent(id: string) {
+  for (const t of ["passages", "attendees", "event_sessions", "capacity_requests", "event_scanners"] as const) {
+    const { error: e } = await supabase.from(t).delete().eq("event_id", id);
+    if (e) throw e;
+  }
   const { error } = await supabase.from("events").delete().eq("id", id);
   if (error) throw error;
 }
@@ -312,8 +324,7 @@ export async function scanTicketV2(ticketCode: string, eventId: string, force: b
 // QR invité : contient une adresse /m/<code> pour que l'invité voie le menu avec son téléphone ;
 // les agents scannent le même QR, le code est extrait de l'adresse.
 export function ticketQrValue(code: string) {
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  return `${origin}/m/${code}`;
+  return `${publicOrigin()}/m/${code}`;
 }
 export function extractTicket(value: string) {
   const v = value.trim();
