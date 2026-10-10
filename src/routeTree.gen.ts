@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminHotelRouteImport } from './routes/admin-hotel'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as MCodeRouteImport } from './routes/m.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MCodeRoute = MCodeRouteImport.update({
+  id: '/m/$code',
+  path: '/m/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-hotel': typeof AdminHotelRoute
   '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/m/$code': typeof MCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-hotel': typeof AdminHotelRoute
   '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/m/$code': typeof MCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/admin-hotel': typeof AdminHotelRoute
   '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/m/$code': typeof MCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin-hotel' | '/scanner' | '/invite/$token'
+  fullPaths: '/' | '/admin-hotel' | '/scanner' | '/invite/$token' | '/m/$code'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin-hotel' | '/scanner' | '/invite/$token'
-  id: '__root__' | '/' | '/admin-hotel' | '/scanner' | '/invite/$token'
+  to: '/' | '/admin-hotel' | '/scanner' | '/invite/$token' | '/m/$code'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin-hotel'
+    | '/scanner'
+    | '/invite/$token'
+    | '/m/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   AdminHotelRoute: typeof AdminHotelRoute
   ScannerRoute: typeof ScannerRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  MCodeRoute: typeof MCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/m/$code': {
+      id: '/m/$code'
+      path: '/m/$code'
+      fullPath: '/m/$code'
+      preLoaderRoute: typeof MCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminHotelRoute: AdminHotelRoute,
   ScannerRoute: ScannerRoute,
   InviteTokenRoute: InviteTokenRoute,
+  MCodeRoute: MCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
