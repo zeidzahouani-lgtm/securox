@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Check, Download, Lock, UtensilsCrossed, X } from "lucide-react";
+import { Check, Download, Lock, Upload, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  closeEventNow, decideRequest, listRequests, updateEventRoom, uploadMenu, removeMenu,
+  closeEventNow, decideRequest, listRequests, updateEventRoom, uploadMenu, removeMenu, setEventMenu,
   MASTER_PREFIX, type EventRow,
 } from "@/lib/gate";
+import { listMedia, kind } from "@/lib/media";
 import { downloadQrJpg } from "@/lib/qrimage";
 
 export function EventExtras({ event }: { event: EventRow }) {
