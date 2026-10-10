@@ -14,6 +14,7 @@ import { Route as AdminHotelRouteImport } from './routes/admin-hotel'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as MCodeRouteImport } from './routes/m.$code'
+import { Route as PTokenRouteImport } from './routes/p.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const MCodeRoute = MCodeRouteImport.update({
   path: '/m/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PTokenRoute = PTokenRouteImport.update({
+  id: '/p/$token',
+  path: '/p/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
   '/m/$code': typeof MCodeRoute
+  '/p/$token': typeof PTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
   '/m/$code': typeof MCodeRoute
+  '/p/$token': typeof PTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,12 +70,25 @@ export interface FileRoutesById {
   '/scanner': typeof ScannerRoute
   '/invite/$token': typeof InviteTokenRoute
   '/m/$code': typeof MCodeRoute
+  '/p/$token': typeof PTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin-hotel' | '/scanner' | '/invite/$token' | '/m/$code'
+  fullPaths:
+    | '/'
+    | '/admin-hotel'
+    | '/scanner'
+    | '/invite/$token'
+    | '/m/$code'
+    | '/p/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin-hotel' | '/scanner' | '/invite/$token' | '/m/$code'
+  to:
+    | '/'
+    | '/admin-hotel'
+    | '/scanner'
+    | '/invite/$token'
+    | '/m/$code'
+    | '/p/$token'
   id:
     | '__root__'
     | '/'
@@ -75,6 +96,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/invite/$token'
     | '/m/$code'
+    | '/p/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -83,6 +105,7 @@ export interface RootRouteChildren {
   ScannerRoute: typeof ScannerRoute
   InviteTokenRoute: typeof InviteTokenRoute
   MCodeRoute: typeof MCodeRoute
+  PTokenRoute: typeof PTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/p/$token': {
+      id: '/p/$token'
+      path: '/p/$token'
+      fullPath: '/p/$token'
+      preLoaderRoute: typeof PTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -131,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScannerRoute: ScannerRoute,
   InviteTokenRoute: InviteTokenRoute,
   MCodeRoute: MCodeRoute,
+  PTokenRoute: PTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
