@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CalendarDays, Images, KeyRound, Loader2, LogOut, ScanLine, UtensilsCrossed } from "lucide-react";
+import { CalendarDays, KeyRound, Loader2, LogOut, ScanLine, UtensilsCrossed } from "lucide-react";
 import { MediaLibrary } from "./MediaLibrary";
 import { OutletsTab } from "./OutletsTab";
 import { useAuth, signOut, type Role } from "@/lib/auth";
@@ -69,14 +69,14 @@ export function AppShell({ children }: { authSubtitle?: string; children?: (role
   );
 }
 
-type AdminTab = "events" | "library" | "outlets" | "scanner" | "users";
+type AdminTab = "events" | "outlets" | "scanner" | "users";
 function RoleHome({ role }: { role: Role }) {
   const [tab, setTab] = useState<AdminTab>("events");
   if (role === "client") return <ClientTab />;
   if (role === "scanner") return <ScannerTab />;
   const groups = [
     ["Gestion", [["events", "Événements", CalendarDays], ["scanner", "Scanner live", ScanLine]]],
-    ["Contenu", [["library", "Médiathèque", Images], ["outlets", "Menus & QR", UtensilsCrossed]]],
+    ["Contenu", [["outlets", "Menus & médiathèque", UtensilsCrossed]]],
     ["Réglages", [["users", "Codes PIN", KeyRound]]],
   ] as const;
   return (
@@ -97,8 +97,7 @@ function RoleHome({ role }: { role: Role }) {
         </nav>
       </aside>
       <section className="min-w-0">
-        {tab === "events" ? <EventsTab /> : tab === "users" ? <UsersTab /> : tab === "library" ? <MediaLibrary />
-          : tab === "outlets" ? <OutletsTab /> : <ScannerTab />}
+        {tab === "events" ? <EventsTab /> : tab === "users" ? <UsersTab /> : tab === "outlets" ? <div className="space-y-10"><OutletsTab /><MediaLibrary /></div> : <ScannerTab />}
       </section>
     </div>
   );
