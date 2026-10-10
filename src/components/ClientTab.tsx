@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QRCodeCanvas } from "qrcode.react";
 import { useEffect, useRef, useState } from "react";
 import { Download, Loader2, Printer, Trash2 } from "lucide-react";
-import { addAttendee, deleteAttendee, listAttendees, listEvents } from "@/lib/gate";
+import { addAttendee, deleteAttendee, listAttendees, listEvents, ticketQrValue } from "@/lib/gate";
 
 function downloadTicketJpg(canvas: HTMLCanvasElement, guestName: string, code: string) {
   const pad = 16;
