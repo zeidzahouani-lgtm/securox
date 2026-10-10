@@ -229,6 +229,60 @@ export type Database = {
         }
         Relationships: []
       }
+      media_items: {
+        Row: {
+          created_at: string
+          id: string
+          mime: string
+          name: string
+          path: string
+          size: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mime?: string
+          name: string
+          path: string
+          size?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mime?: string
+          name?: string
+          path?: string
+          size?: number
+        }
+        Relationships: []
+      }
+      outlets: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          media_ids: string[]
+          name: string
+          public_token: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          media_ids?: string[]
+          name: string
+          public_token?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          media_ids?: string[]
+          name?: string
+          public_token?: string
+        }
+        Relationships: []
+      }
       passages: {
         Row: {
           agent: string | null
@@ -372,6 +426,7 @@ export type Database = {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
       }
+      outlet_public: { Args: { _token: string }; Returns: Json }
       resolve_login: { Args: { _username: string }; Returns: string }
       set_pin: { Args: { _pin: string; _role: string }; Returns: undefined }
     }

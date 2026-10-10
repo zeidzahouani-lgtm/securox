@@ -15,6 +15,13 @@
       "when": 1791639782657,
       "tag": "0001_event_menus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791640241618,
+      "tag": "0002_media_library_outlets",
+      "breakpoints": true
     }
   ]
 }

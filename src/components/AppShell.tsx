@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CalendarDays, KeyRound, Loader2, LogOut, ScanLine } from "lucide-react";
+import { CalendarDays, Images, KeyRound, Loader2, LogOut, ScanLine, UtensilsCrossed } from "lucide-react";
+import { MediaLibrary } from "./MediaLibrary";
+import { OutletsTab } from "./OutletsTab";
 import { useAuth, signOut, type Role } from "@/lib/auth";
 import { RoleGate } from "./RoleGate";
 import { EventsTab } from "./EventsTab";
@@ -67,26 +69,37 @@ export function AppShell({ children }: { authSubtitle?: string; children?: (role
   );
 }
 
+type AdminTab = "events" | "library" | "outlets" | "scanner" | "users";
 function RoleHome({ role }: { role: Role }) {
-  const [tab, setTab] = useState<"events" | "users" | "scanner">("events");
+  const [tab, setTab] = useState<AdminTab>("events");
   if (role === "client") return <ClientTab />;
   if (role === "scanner") return <ScannerTab />;
-  const tabs = [
-    ["events", "Événements", CalendarDays],
-    ["scanner", "Scanner live", ScanLine],
-    ["users", "Codes PIN", KeyRound],
+  const groups = [
+    ["Gestion", [["events", "Événements", CalendarDays], ["scanner", "Scanner live", ScanLine]]],
+    ["Contenu", [["library", "Médiathèque", Images], ["outlets", "Menus & QR", UtensilsCrossed]]],
+    ["Réglages", [["users", "Codes PIN", KeyRound]]],
   ] as const;
   return (
-    <>
-      <div className="mb-8 flex flex-wrap items-center gap-2 border-b border-border pb-4 no-print">
-        {tabs.map(([k, label, Icon]) => (
-          <Button variant={tab === k ? "default" : "ghost"} key={k} onClick={() => setTab(k)}
-            className="h-11 px-4 font-semibold" aria-pressed={tab === k}>
-            <Icon className="size-4" /> {label}
-          </Button>
-        ))}
-      </div>
-      {tab === "events" ? <EventsTab /> : tab === "users" ? <UsersTab /> : <ScannerTab />}
-    </>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
+      <aside className="glass-panel h-fit rounded-lg p-3 no-print lg:sticky lg:top-4">
+        <nav className="flex gap-1 overflow-x-auto lg:flex-col lg:gap-4">
+          {groups.map(([g, items]) => (
+            <div key={g} className="flex gap-1 lg:flex-col">
+              <p className="hidden px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:block">{g}</p>
+              {items.map(([k, label, Icon]) => (
+                <Button key={k} variant={tab === k ? "default" : "ghost"} onClick={() => setTab(k)}
+                  className="h-10 justify-start whitespace-nowrap px-3 font-semibold" aria-pressed={tab === k}>
+                  <Icon className="size-4" /> {label}
+                </Button>
+              ))}
+            </div>
+          ))}
+        </nav>
+      </aside>
+      <section className="min-w-0">
+        {tab === "events" ? <EventsTab /> : tab === "users" ? <UsersTab /> : tab === "library" ? <MediaLibrary />
+          : tab === "outlets" ? <OutletsTab /> : <ScannerTab />}
+      </section>
+    </div>
   );
 }
