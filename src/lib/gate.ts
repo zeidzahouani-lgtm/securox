@@ -343,6 +343,10 @@ export async function removeMenu(eventId: string) {
   const { error } = await supabase.from("events").update({ menu_path: null } as never).eq("id", eventId);
   if (error) throw error;
 }
+export async function setEventMenu(eventId: string, path: string | null) {
+  const { error } = await supabase.from("events").update({ menu_path: path } as never).eq("id", eventId);
+  if (error) throw error;
+}
 export async function menuUrl(path: string) {
   const { data, error } = await supabase.storage.from("menus").createSignedUrl(path, 3600);
   if (error) throw error;
