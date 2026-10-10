@@ -21,6 +21,11 @@ export function ScannerTab() {
   const [search, setSearch] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const sessions = useQuery({ queryKey: ["sessions", eventId], queryFn: () => listSessions(eventId!), enabled: !!eventId });
+  useEffect(() => {
+    const now = Date.now();
+    const cur = sessions.data?.find((x) => new Date(x.starts_at).getTime() <= now && now <= new Date(x.ends_at).getTime());
+    setSessionId(cur?.id ?? "");
+  }, [sessions.data]);
   const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
   const lastScanRef = useRef<{ code: string; at: number } | null>(null);
 

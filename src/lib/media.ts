@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/gate";
 import { supabase } from "@/integrations/supabase/client";
 
 export type MediaItem = { id: string; name: string; path: string; mime: string; size: number; created_at: string };
@@ -55,6 +56,6 @@ export async function outletPublic(token: string): Promise<{ name: string; descr
   if (error) throw error;
   return data;
 }
-export const outletUrl = (token: string) => `${typeof window !== "undefined" ? window.location.origin : ""}/p/${token}`;
+export const outletUrl = (token: string) => `${publicOrigin()}/p/${token}`;
 export const kind = (mime: string, path = "") =>
   mime.startsWith("image/") ? "image" : mime.startsWith("video/") ? "video" : mime === "application/pdf" || path.endsWith(".pdf") ? "pdf" : "file";

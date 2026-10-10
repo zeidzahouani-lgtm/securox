@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Copy, FileDown, Loader2, Trash2 } from "lucide-react";
+import { Copy, FileDown, Loader2, Plus, Trash2, X } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { downloadEventReport } from "@/lib/report";
 import {
+  addSession,
   closeEndedEvents,
   createEvent,
   deleteEvent,
@@ -20,8 +25,13 @@ export function EventsTab() {
   useLiveGate();
   const [title, setTitle] = useState("");
   const [room, setRoom] = useState("");
-  const [date, setDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [day, setDay] = useState("");
+  const [endDay, setEndDay] = useState("");
+  const [startTime, setStartTime] = useState("08:00");
+  const [endTime, setEndTime] = useState("23:59");
+  const [slots, setSlots] = useState<{ name: string; start: string; end: string }[]>([]);
+  const date = day ? `${day}T${startTime}` : "";
+  const endDate = (endDay || day) ? `${endDay || day}T${endTime}` : "";
   const [capacity, setCapacity] = useState(100);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,13 +58,17 @@ export function EventsTab() {
   });
 
   const create = useMutation({
-    mutationFn: createEvent,
+    mutationFn: async (input: Parameters<typeof createEvent>[0]) => {
+      for (const sl of slots) if (!sl.name.trim() || sl.end <= sl.start) throw new Error(`Créneau « ${sl.name || "sans nom"} » : l'heure de fin doit être après le début`);
+      const ev = await createEvent(input);
+      for (const sl of slots) await addSession(ev.id, sl.name.trim(), `${day}T${sl.start}`, `${day}T${sl.end}`);
+      return ev;
+    },
     onSuccess: (e: EventRow) => {
       setSelectedId(e.id);
       setTitle("");
       setRoom("");
-      setDate("");
-      setEndDate("");
+      setDay(""); setEndDay(""); setSlots([]);
       qc.invalidateQueries({ queryKey: ["events"] });
     },
     onError: (e: Error) => setError(e.message),
@@ -62,6 +76,7 @@ export function EventsTab() {
 
   const remove = useMutation({
     mutationFn: deleteEvent,
+    onError: (e: Error) => alert("Suppression impossible : " + e.message),
     onSuccess: () => {
       setSelectedId(null);
       qc.invalidateQueries({ queryKey: ["events"] });
@@ -87,12 +102,36 @@ export function EventsTab() {
               <input className="field-input mt-1" placeholder="ex : Dar Zmen" value={room} onChange={(e) => setRoom(e.target.value)} />
             </div>
             <div>
-              <label className="field-label">Début</label>
-              <input type="datetime-local" className="field-input mt-1" value={date} onChange={(e) => setDate(e.target.value)} />
+              <label className="field-label">Date</label>
+              <input type="date" className="field-input mt-1" value={day} onChange={(e) => setDay(e.target.value)} />
             </div>
             <div>
-              <label className="field-label">Fin</label>
-              <input type="datetime-local" className="field-input mt-1" value={endDate} min={date} onChange={(e) => setEndDate(e.target.value)} />
+              <label className="field-label">Date de fin (si plusieurs jours)</label>
+              <input type="date" className="field-input mt-1" value={endDay} min={day} onChange={(e) => setEndDay(e.target.value)} />
+            </div>
+            <div>
+              <label className="field-label">Heure de début</label>
+              <input type="time" step={900} className="field-input mt-1" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            </div>
+            <div>
+              <label className="field-label">Heure de fin</label>
+              <input type="time" step={900} className="field-input mt-1" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="field-label">Créneaux (le même QR code entre une fois par créneau)</label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button type="button" size="sm" variant="outline" onClick={() => setSlots((x) => [...x, { name: "Déjeuner", start: "12:00", end: "15:00" }])}><Plus className="size-3.5" /> Déjeuner</Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => setSlots((x) => [...x, { name: "Dîner", start: "19:00", end: "23:00" }])}><Plus className="size-3.5" /> Dîner</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setSlots((x) => [...x, { name: "", start: "09:00", end: "11:00" }])}><Plus className="size-3.5" /> Autre</Button>
+              </div>
+              {slots.map((sl, i) => (
+                <div key={i} className="mt-2 grid grid-cols-[1fr_auto_auto_auto] items-center gap-2">
+                  <input className="field-input" placeholder="Nom du créneau" value={sl.name} onChange={(e) => setSlots((x) => x.map((y, j) => j === i ? { ...y, name: e.target.value } : y))} />
+                  <input type="time" step={900} className="field-input w-28" value={sl.start} onChange={(e) => setSlots((x) => x.map((y, j) => j === i ? { ...y, start: e.target.value } : y))} />
+                  <input type="time" step={900} className="field-input w-28" value={sl.end} onChange={(e) => setSlots((x) => x.map((y, j) => j === i ? { ...y, end: e.target.value } : y))} />
+                  <Button type="button" size="icon" variant="ghost" aria-label="Retirer" onClick={() => setSlots((x) => x.filter((_, j) => j !== i))}><X className="size-4" /></Button>
+                </div>
+              ))}
             </div>
             <div>
               <label className="field-label">Nombre de QR codes</label>
@@ -117,9 +156,23 @@ export function EventsTab() {
           <div className="glass-panel space-y-5 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-display text-lg font-semibold">{selected.title}</h3>
-              <Button variant="ghost" onClick={() => confirm("Supprimer cet événement ?") && remove.mutate(selected.id)} className="text-rose" aria-label="Supprimer">
-                <Trash2 className="size-4" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" className="text-rose" aria-label="Supprimer"><Trash2 className="size-4" /> Supprimer</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Supprimer « {selected.title} » ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      L'événement, tous ses QR codes, créneaux et passages seront définitivement supprimés. Cette action est irréversible.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction className="bg-destructive text-destructive-foreground" onClick={() => remove.mutate(selected.id)}>Supprimer définitivement</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
             <p className="text-xs text-muted-foreground">
               {new Date(selected.date).toLocaleString()} → {selected.end_date ? new Date(selected.end_date).toLocaleString() : "—"}
