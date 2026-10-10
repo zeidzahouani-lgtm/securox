@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Check, Download, Lock, Trash2, UtensilsCrossed, X } from "lucide-react";
+import { Check, Download, Lock, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  addSession, closeEventNow, decideRequest, deleteSession, listRequests, listSessions, updateEventRoom, uploadMenu, removeMenu,
+  closeEventNow, decideRequest, listRequests, updateEventRoom, uploadMenu, removeMenu,
   MASTER_PREFIX, type EventRow,
 } from "@/lib/gate";
 import { downloadQrJpg } from "@/lib/qrimage";
@@ -13,19 +13,7 @@ export function EventExtras({ event }: { event: EventRow }) {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [mErr, setMErr] = useState<string | null>(null);
-  const sessions = useQuery({ queryKey: ["sessions", event.id], queryFn: () => listSessions(event.id) });
   const [room, setRoom] = useState(event.room ?? "");
-  const [name, setName] = useState("");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [err, setErr] = useState<string | null>(null);
-  const inv = () => qc.invalidateQueries({ queryKey: ["sessions", event.id] });
-  const add = useMutation({
-    mutationFn: () => addSession(event.id, name.trim(), start, end),
-    onSuccess: () => { setName(""); setStart(""); setEnd(""); inv(); },
-    onError: (e: Error) => setErr(e.message),
-  });
-  const del = useMutation({ mutationFn: deleteSession, onSuccess: inv });
   const saveRoom = useMutation({
     mutationFn: () => updateEventRoom(event.id, room.trim()),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
@@ -67,29 +55,6 @@ export function EventExtras({ event }: { event: EventRow }) {
           <input className="field-input" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="ex : Dar Zmen" />
           <Button variant="outline" onClick={() => saveRoom.mutate()} disabled={saveRoom.isPending}>Enregistrer</Button>
         </div>
-      </div>
-
-      <div>
-        <p className="field-label mb-2">Sessions (matin, déjeuner, dîner…)</p>
-        <div className="space-y-2">
-          {sessions.data?.map((s) => (
-            <div key={s.id} className="flex items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm">
-              <span className="font-semibold">{s.name}</span>
-              <span className="text-xs text-muted-foreground">
-                {new Date(s.starts_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })} → {new Date(s.ends_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-              </span>
-              <Button variant="ghost" size="icon" className="ml-auto text-rose" aria-label="Supprimer la session" onClick={() => del.mutate(s.id)}><Trash2 className="size-4" /></Button>
-            </div>
-          ))}
-          {!sessions.data?.length && <p className="text-sm text-muted-foreground">Aucune session : une seule entrée par invité.</p>}
-        </div>
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
-          <input className="field-input" placeholder="Nom (ex : Déjeuner)" value={name} onChange={(e) => setName(e.target.value)} />
-          <input type="datetime-local" className="field-input" value={start} onChange={(e) => setStart(e.target.value)} />
-          <input type="datetime-local" className="field-input" value={end} min={start} onChange={(e) => setEnd(e.target.value)} />
-          <Button disabled={!name.trim() || !start || !end || add.isPending} onClick={() => { setErr(null); add.mutate(); }}>Ajouter</Button>
-        </div>
-        {err && <p className="mt-2 text-sm text-rose">{err}</p>}
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
