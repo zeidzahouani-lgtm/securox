@@ -43,7 +43,7 @@ export function TicketQr({
   return (
     <div className="rounded-lg border border-border bg-muted/40 p-3">
       <div className="mb-2 grid place-items-center rounded-lg bg-paper p-2">
-        <QRCodeCanvas ref={ref} value={code} size={140} marginSize={2} />
+        <QRCodeCanvas ref={ref} value={ticketQrValue(code)} size={140} marginSize={2} />
       </div>
       <p className="break-words font-semibold">{guestName}</p>
       <p className="break-all font-mono text-[11px] text-muted-foreground">{code}</p>
