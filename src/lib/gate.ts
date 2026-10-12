@@ -112,7 +112,7 @@ export async function createEvent(input: {
 }
 
 // Adresse publique utilisée dans les QR codes : l'aperçu de l'éditeur n'est pas accessible depuis un téléphone.
-export const PUBLIC_ORIGIN = "https://access.dravox.cloud";
+export const PUBLIC_ORIGIN = "https://radisson-bt.securox.tn";
 export function publicOrigin() {
   if (typeof window === "undefined") return PUBLIC_ORIGIN;
   const o = window.location.origin;
